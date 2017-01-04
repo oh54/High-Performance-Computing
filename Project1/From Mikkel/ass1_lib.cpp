@@ -16,11 +16,10 @@ void matmult_nat(int m, int n, int k, double ** A, double ** B, double ** C){
 }
 
 // library implementation through cblas
-/*
 void matmult_lib(int m, int n, int k, double ** A, double ** B, double ** C){
-	cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1 , A, k, B, n);
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0 , A[0], k, B[0], n, 0.0, C[0], n);
 }
-*/
+
 
 // Permutations of kmn
 void matmult_kmn(int m, int n, int k, double ** A, double ** B, double ** C){
