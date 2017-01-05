@@ -35,3 +35,4 @@ NUMA node1 CPU(s):     10-19
  12285.375    661.064 0 # matmult_knm
  24576.000    161.745 0 # matmult_knm
  49141.500    484.636 0 # matmult_knm
+ 98304.000    111.793 0 # matmult_knm
