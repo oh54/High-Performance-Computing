@@ -15,7 +15,7 @@ sizes=( 16 23 32 45 64 90 128 181 256 362 512 724 1024 1448 2048 )
 
 for size in ${sizes[@]}
  do
-  ./matmult_c.studio mnk $size $size $size
+  ./matmult_c.studio $perm $size $size $size
  done
 
 #for N in ${sizes[@]}
