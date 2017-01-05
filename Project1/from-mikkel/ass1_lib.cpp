@@ -35,12 +35,7 @@ void matmult_blk(int m, int n, int k, double ** A, double ** B, double ** C, int
 int bsi=bs;
 int bsj=bs;
 int bsl=bs;
-int m2=m%bs;
-int n2=n%bs;
-int k2=k%bs;
-int m1=m-m2;
-int n1=n-n2;
-int k1=k-k2;
+
 
 
 
