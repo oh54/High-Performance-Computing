@@ -13,6 +13,8 @@ module load studio
 
 sizes=( 256 1024 )
 
+MFLOPS_MAX_IT=1
+
 for size in ${sizes[@]}
  do
   if [ "$perm" = "blk" ]; then
