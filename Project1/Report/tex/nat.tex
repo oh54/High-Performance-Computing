@@ -1,0 +1,8 @@
+\subsection{Nat}
+
+First, the goal is to write a native function, which performs a matrix-matrix multiplication. The shape has to be suitable for the operation, but it is arbitrary within the limits. We chose the native way, where the matrix is described using double pointers, i.e. A[i][j]. The choice of function prototypes and driver therefore follows.  \\
+The general function prototype used is displayed below:
+\begin{lstlisting}[language=C++, caption=Function Prototype]
+void matmult_NNN(int m, int n, int k, double ** A, double ** B, double ** C)
+\end{lstlisting}
+

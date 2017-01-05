@@ -2,10 +2,10 @@ TARGET	= libmatmult.so
 LIBSRCS	= 
 LIBOBJS	= ass1_lib.o
 
-OPT	= -g # -O3
+OPT	= -g -fast
 PIC	= -fPIC
 
-CXX	= g++
+CXX	= sunCC
 CXXFLAGS= $(OPT) $(PIC) $(XOPTS)
 
 SOFLAGS = -shared 
