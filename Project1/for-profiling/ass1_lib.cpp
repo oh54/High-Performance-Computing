@@ -32,14 +32,25 @@ void matmult_blk(int m, int n, int k, double ** A, double ** B, double ** C, int
 		}
  	
 	} 
+int bsi=bs;
+int bsj=bs;
+int bsl=bs;
 
 
-for(int i1 = 0; i1 < m;i1+=bs){
-	for(int l1 = 0; l1 < k;l1+=bs){
-		for(int j1 = 0; j1 < n;j1+=bs){
-			for(int i2 = 0; i2 < bs; i2++){	
-				for(int l2 = 0; l2 < bs;l2++){	
-					for(int j2 = 0; j2 < bs; j2++){	
+
+
+for(int i1 = 0; i1 < m;i1+=bsi){
+	if(m-i1 < bs) {bsi=m-i1;
+	}
+	for(int l1 = 0; l1 < k;l1+=bsl){
+		if(k-l1 < bs) {bsl=k-l1;
+		}
+		for(int j1 = 0; j1 < n;j1+=bsj){
+			if(n-j1 < bs) {bsj=n-j1;
+			}
+			for(int i2 = 0; i2 < bsi; i2++){	
+				for(int l2 = 0; l2 < bsl;l2++){	
+					for(int j2 = 0; j2 < bsj; j2++){	
 							C[i1+i2][j1+j2] += A[i1+i2][l1+l2]*B[l1+l2][j1+j2];
 					}
 				}
@@ -47,8 +58,16 @@ for(int i1 = 0; i1 < m;i1+=bs){
 		}
 	}
 }
-
-}
+/*
+for(int i2 = m1; i2 < m; i2++){	
+	for(int l2 = n1; l2 < n;l2++){	
+		for(int j2 = k1; j2 < k; j2++){	
+			C[i2][j2] += A[i2][l2]*B[l2][j2];
+			}
+		}
+	}
+*/
+} 
 
 
 // Permutations of kmn

@@ -1,16 +1,23 @@
 #!/bin/sh
 
 #PBS -q hpcintro
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=60:00
+#PBS -N collector
 cd $PBS_O_WORKDIR
 
-echo 'CPU info'
-lscpu
+module load studio
 
-sizes=( 16 23 32 45 64 90 128 181 256 362 512 724 1024 1448 2048 2896 4096 )
+#echo 'CPU info'
+#lscpu
+
+sizes=( 256 1024 )
 
 for size in ${sizes[@]}
  do
-  ./matmult_c.studio $perm $size $size $size
+  if [ "$perm" = "blk" ]; then
+   collect -h dch,on,dcm,on,l2h,on,l2m,on ./matmult_c.studio $perm $size $size $size $blksize
+  else
+   collect -h dch,on,dcm,on,l2h,on,l2m,on ./matmult_c.studio $perm $size $size $size
+  fi
  done
-
-
