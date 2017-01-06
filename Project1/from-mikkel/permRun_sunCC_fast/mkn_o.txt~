@@ -1,0 +1,40 @@
+CPU info
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                20
+On-line CPU(s) list:   0-19
+Thread(s) per core:    1
+Core(s) per socket:    10
+Socket(s):             2
+NUMA node(s):          2
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 63
+Stepping:              2
+CPU MHz:               2601.000
+BogoMIPS:              5187.93
+Virtualization:        VT-x
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              256K
+L3 cache:              25600K
+NUMA node0 CPU(s):     0-9
+NUMA node1 CPU(s):     10-19
+     6.000   1495.555 0 # matmult_mkn
+    12.398   1538.230 0 # matmult_mkn
+    24.000   1556.831 0 # matmult_mkn
+    47.461   1575.387 0 # matmult_mkn
+    96.000   1568.210 0 # matmult_mkn
+   189.844   1595.735 0 # matmult_mkn
+   384.000   1583.762 0 # matmult_mkn
+   767.836   1558.619 0 # matmult_mkn
+  1536.000   1562.466 0 # matmult_mkn
+  3071.344   1577.823 0 # matmult_mkn
+  6144.000   1572.591 0 # matmult_mkn
+ 12285.375   1539.356 0 # matmult_mkn
+ 24576.000   1427.432 0 # matmult_mkn
+ 49141.500   1418.920 0 # matmult_mkn
+ 98304.000   1434.025 0 # matmult_mkn
+196566.000   1407.900 0 # matmult_mkn
+393216.000   1398.570 0 # matmult_mkn

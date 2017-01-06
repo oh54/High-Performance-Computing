@@ -1,0 +1,16 @@
+     6.000    747.365 0 # matmult_blk 2
+    12.398    404.698 0 # matmult_blk 2
+    24.000    805.335 0 # matmult_blk 2
+    47.461    417.641 0 # matmult_blk 2
+    96.000    822.808 0 # matmult_blk 2
+   189.844    841.599 0 # matmult_blk 2
+   384.000    839.268 0 # matmult_blk 2
+   767.836    421.927 0 # matmult_blk 2
+  1536.000    828.767 0 # matmult_blk 2
+  3071.344    843.886 0 # matmult_blk 2
+  6144.000    826.589 0 # matmult_blk 2
+ 12285.375    846.526 0 # matmult_blk 2
+ 24576.000    825.763 0 # matmult_blk 2
+ 49141.500    845.230 0 # matmult_blk 2
+ 98304.000    816.425 0 # matmult_blk 2
+196566.000    834.301 0 # matmult_blk 2
