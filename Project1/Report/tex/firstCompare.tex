@@ -1,5 +1,21 @@
 \subsection{Comparing the permutations}
-The performance of the six different functions resulting from the possibilities of permuting mnk are tested with square matrices with memory footprints ranging from a few kB to hundreds of MB. The results are seen in figure \ref{fig:comp1} with compiler option $\mathrm{-fast}$ enabled. The performance of the six functions behave in pairs depending on the last index which corresponds to the innermost for-loop. The functions pair up depending on this index because it is the loop being executed the most times, and so any performance issue coming from this loop is executed the most times as well. As seen in the figure \ref{fig:comp1}, the permutations with $m$ as the last index is a factor of $\sim 2$ slower than the other four permutations for memory footprints smaller than L2 cache. This is because $m$ is the column size of matrices $A$ and $C$, so by having the $m$ loop as the innermost loop, a lot of cache misses will happen due to C being a row major language, and looping along the columns as the fast loop will reduce the speed significantly. When the memory footprint exceeds the L2 cache size, the permutations with $k$ as the inner loop drops to the performance level of the permutations ending with $m$. The $k$-parameter is the row size of $A$ and column size of $B$, so in theory we should observe low performance, but it is likely that the compiler has optimized the structure in a way that is only beneficial as long as the data structures involved will fit on the L2 cache. Finally, the permutations with the $n$-loop as the fast loop perform well even when exceeding the L2 cache size. $n$ is the row size of $B$ and $C$, so looping over this variable fits well with C, and it gives the best possibilities for the compiler to optimize. When the L3 cache size is exceeded, the performance drops due to the fact that the data must now be transferred from the memory to the caches, and the bandwidth from the memory to the caches is much smaller than from cache to cache. The drop is not large, so it is possible that the compiler utilizes prefetching to reduce the effect of the decreased bandwidth. It is also worth noting that mkn performs better than kmn for all memory footprints, and the reason here is that the loop over $m$ is the slowest, and thus to achieve the best performance, this loop must placed as the outmost loop.
+The performance of the six different functions resulting from the possibilities of permuting mnk are tested with square matrices with memory footprints ranging from a few kB to hundreds of MB. The results are seen in figure \ref{fig:permGraph_none} with no compiler options. All six permutations perform equally well when the memory footprint is less than the L2 cache. For memory footprints larger than L2, the permutations with the loop over $n$ maintain the same performance, while the other four permutations have a significant reduction of performance. This is due to the fact that $m$ is the row index for matrices B and C, and that works well with the C language which is row major, meaning that the caches lines go along the rows of the matrices. The performance does not degrade after exceeding L3 which shows that program does not utilize the caches optimally. If that was the case, the smaller bandwidth between the memory and the processor would cause a significant drop in the performance when the memory footprint exceeds L3.
+\begin{figure}
+\centering
+\includegraphics[width = 1.1\textwidth]{fig/permGraph_none.eps}
+\caption{The performance of the different permutations versus the memory footprint, with L1, L2, and L3 caches shown as the vertical black dotted lines.}
+\label{fig:permGraph_none}
+\end{figure}
+To investigate this, the same graph is produced, but this time the $\mathrm{-fast}$ option is activated in the Sun Studio compiler, and the results are shown in figure \ref{fig:permGraph_fast}. All six functions have improved performance compared to the case without compiler options, but the functions with $k$ as the inner loop, are a factor of $\sim 2$  slower for memory footprints which fit in either L1 and L2 caches. This is due to the fact that when $k$ is the inner loop, the program needs to fetch two new values to multiply together, and the compiler optimizer apparently has some issues optimizing this. When the memory footprint exceeds L2, the functions with $m$ as the inner loop drop off to the level of the functions with $k$ as the inner loop. This is because $m$ is the column size of matrices A and C, and looping over this as the inner loop goes against the row major format of C. For smaller memory footprints, the compiler is able to mitigate this issue, but after L2, the compiler optimizer can not fix the issue, and the performance drops. When the memory footprint does not exceed the size of the L3 cache, the performance of the functions with $n$ perform at a constant rate. This is again due to the row major format of C and $n$ being the row size of matrices B and C. After the L3 cahce size, the performance drops $\sim 10 \%$, which is less than expected, but that is probably due some extensive prefetching performed by the compiler when the $\mathrm{-fast}$ option is enabled. It is also worth noting that mkn performs better than kmn for all memory footprints, and the reason here is that the loop over $m$ is the slowest, and thus to achieve the best performance, this loop must placed as the outmost loop.
+
+\begin{figure}
+\centering
+\includegraphics[width = 1.1\textwidth]{fig/permGraph_fast.eps}
+\caption{The performance of the different permutations versus the memory footprint with compiler option $\mathrm{-fast}$ activated. L1, L2, and L3 caches shown as the vertical black dotted lines.}
+\label{fig:comp1}
+\end{figure}
+
+
 
 \subsubsection{Analyzer tool}
 We expect better-performing permutations to have less cache misses.   To validate our hypotheses regarding cache hits we conducted a profiling experiment. That is, we fixed the matrix dimension size to 724 which corresponds to ~12MB memory footprint, ran each of the six permutations (without compiler optimizations) using the collect command and viewed the results using Oracle Solaris Studio Performance Analyzer. To be able to make direct comparisons, we set the minimum runtime to zero and max iterations to one. This way each permutation is run for a single iteration and we can compare cache hits in absolute terms. \\
@@ -30,12 +46,7 @@ Interpret results of table
 
 When the memory footprint 
 
-\begin{figure}
-\centering
-\includegraphics[width = 1.1\textwidth]{fig/permGraph_fast.eps}
-\caption{This is a caption}
-\label{fig:comp1}
-\end{figure}
+
 
 \begin{itemize}
 \item hpcintro queue node cpu information
