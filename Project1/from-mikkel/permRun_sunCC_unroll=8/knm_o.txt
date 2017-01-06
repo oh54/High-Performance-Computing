@@ -1,0 +1,17 @@
+     6.000    397.491 0 # matmult_knm
+    12.398    410.935 0 # matmult_knm
+    24.000    415.663 0 # matmult_knm
+    47.461    405.129 0 # matmult_knm
+    96.000    394.368 0 # matmult_knm
+   189.844    409.836 0 # matmult_knm
+   384.000    351.555 0 # matmult_knm
+   767.836    370.419 0 # matmult_knm
+  1536.000    225.809 0 # matmult_knm
+  3071.344    321.365 0 # matmult_knm
+  6144.000    164.407 0 # matmult_knm
+ 12285.375    193.259 0 # matmult_knm
+ 24576.000    156.068 0 # matmult_knm
+ 49141.500    236.128 0 # matmult_knm
+ 98304.000     67.073 0 # matmult_knm
+196566.000    194.655 0 # matmult_knm
+393216.000     64.541 0 # matmult_knm

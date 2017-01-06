@@ -1,40 +1,16 @@
-CPU info
-Architecture:          x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Little Endian
-CPU(s):                20
-On-line CPU(s) list:   0-19
-Thread(s) per core:    1
-Core(s) per socket:    10
-Socket(s):             2
-NUMA node(s):          2
-Vendor ID:             GenuineIntel
-CPU family:            6
-Model:                 63
-Stepping:              2
-CPU MHz:               2601.000
-BogoMIPS:              5187.93
-Virtualization:        VT-x
-L1d cache:             32K
-L1i cache:             32K
-L2 cache:              256K
-L3 cache:              25600K
-NUMA node0 CPU(s):     0-9
-NUMA node1 CPU(s):     10-19
-     6.000    804.101 0 # matmult_nmk
-    12.398    786.243 0 # matmult_nmk
-    24.000    707.355 0 # matmult_nmk
-    47.461    638.306 0 # matmult_nmk
-    96.000    596.706 0 # matmult_nmk
-   189.844    574.936 0 # matmult_nmk
-   384.000    531.694 0 # matmult_nmk
-   767.836    537.532 0 # matmult_nmk
-  1536.000    515.963 0 # matmult_nmk
-  3071.344    527.341 0 # matmult_nmk
-  6144.000    482.726 0 # matmult_nmk
- 12285.375    501.236 0 # matmult_nmk
- 24576.000    414.475 0 # matmult_nmk
- 49141.500    499.135 0 # matmult_nmk
- 98304.000    177.527 0 # matmult_nmk
-196566.000    384.920 0 # matmult_nmk
-393216.000    160.114 0 # matmult_nmk
+     6.000    803.277 0 # matmult_nmk
+    12.398    786.900 0 # matmult_nmk
+    24.000    706.088 0 # matmult_nmk
+    47.461    638.185 0 # matmult_nmk
+    96.000    598.104 0 # matmult_nmk
+   189.844    574.642 0 # matmult_nmk
+   384.000    532.912 0 # matmult_nmk
+   767.836    535.925 0 # matmult_nmk
+  1536.000    519.532 0 # matmult_nmk
+  3071.344    527.685 0 # matmult_nmk
+  6144.000    494.735 0 # matmult_nmk
+ 12285.375    506.082 0 # matmult_nmk
+ 24576.000    427.510 0 # matmult_nmk
+ 49141.500    502.439 0 # matmult_nmk
+ 98304.000    170.166 0 # matmult_nmk
+196566.000    382.086 0 # matmult_nmk

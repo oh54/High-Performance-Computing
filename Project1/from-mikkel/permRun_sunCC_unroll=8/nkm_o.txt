@@ -1,0 +1,17 @@
+     6.000    398.933 0 # matmult_nkm
+    12.398    410.821 0 # matmult_nkm
+    24.000    416.056 0 # matmult_nkm
+    47.461    405.736 0 # matmult_nkm
+    96.000    395.416 0 # matmult_nkm
+   189.844    414.207 0 # matmult_nkm
+   384.000    356.095 0 # matmult_nkm
+   767.836    357.410 0 # matmult_nkm
+  1536.000    217.848 0 # matmult_nkm
+  3071.344    298.303 0 # matmult_nkm
+  6144.000    175.551 0 # matmult_nkm
+ 12285.375    186.471 0 # matmult_nkm
+ 24576.000    156.216 0 # matmult_nkm
+ 49141.500    226.359 0 # matmult_nkm
+ 98304.000     63.534 0 # matmult_nkm
+196566.000    185.157 0 # matmult_nkm
+393216.000     64.293 0 # matmult_nkm

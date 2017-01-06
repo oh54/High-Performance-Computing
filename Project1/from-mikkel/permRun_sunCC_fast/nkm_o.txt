@@ -1,40 +1,16 @@
-CPU info
-Architecture:          x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Little Endian
-CPU(s):                20
-On-line CPU(s) list:   0-19
-Thread(s) per core:    1
-Core(s) per socket:    10
-Socket(s):             2
-NUMA node(s):          2
-Vendor ID:             GenuineIntel
-CPU family:            6
-Model:                 63
-Stepping:              2
-CPU MHz:               2601.000
-BogoMIPS:              5187.93
-Virtualization:        VT-x
-L1d cache:             32K
-L1i cache:             32K
-L2 cache:              256K
-L3 cache:              25600K
-NUMA node0 CPU(s):     0-9
-NUMA node1 CPU(s):     10-19
-     6.000   1437.889 0 # matmult_nkm
-    12.398   1472.573 0 # matmult_nkm
-    24.000   1514.372 0 # matmult_nkm
-    47.461   1540.401 0 # matmult_nkm
-    96.000   1202.149 0 # matmult_nkm
-   189.844   1543.256 0 # matmult_nkm
-   384.000    677.505 0 # matmult_nkm
-   767.836    942.436 0 # matmult_nkm
-  1536.000    371.548 0 # matmult_nkm
-  3071.344    683.334 0 # matmult_nkm
-  6144.000    234.682 0 # matmult_nkm
- 12285.375    441.993 0 # matmult_nkm
- 24576.000    167.614 0 # matmult_nkm
- 49141.500    458.788 0 # matmult_nkm
- 98304.000     95.923 0 # matmult_nkm
-196566.000    305.405 0 # matmult_nkm
-393216.000     92.177 0 # matmult_nkm
+     6.000   1433.149 0 # matmult_nkm
+    12.398   1471.275 0 # matmult_nkm
+    24.000   1520.749 0 # matmult_nkm
+    47.461   1545.625 0 # matmult_nkm
+    96.000   1204.421 0 # matmult_nkm
+   189.844   1537.911 0 # matmult_nkm
+   384.000    683.806 0 # matmult_nkm
+   767.836    992.708 0 # matmult_nkm
+  1536.000    378.700 0 # matmult_nkm
+  3071.344    685.353 0 # matmult_nkm
+  6144.000    239.213 0 # matmult_nkm
+ 12285.375    471.212 0 # matmult_nkm
+ 24576.000    168.694 0 # matmult_nkm
+ 49141.500    458.580 0 # matmult_nkm
+ 98304.000     91.036 0 # matmult_nkm
+196566.000    314.495 0 # matmult_nkm
