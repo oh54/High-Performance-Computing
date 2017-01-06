@@ -1,1 +1,39 @@
-\subsection{Blocking}
+\subsection{Loop Blocking}
+
+Loop blocking is a technique to improve the memory access and data re-use, and thereby reduce the cache misses. To perform this, the matrices is essentially cut into smaller blocks, which are then solved, where more of the information can be reused, since it is already available in the cache. By implementing loop blocking, we intend to compare the performance of the new blocked loop function with the best performing permutation, which is mkn. The function prototype is almost identical to the earlier used with the new addition, that it takes a specified integer bs as an argument.
+
+\begin{lstlisting}[language=C++, caption=Function Prototype]
+void matmult_blk(int m, int n, int k, double ** A, double ** B, double ** C, int bs)
+\end{lstlisting}
+
+To implement the blocking itself for arbitrarily sized matrices, we introduce 3 blocking size variables in the loop for each dimension. Since the blocking is performed for each dimension, we need six nested loops. The first three are the blocking loops to increases in increments of the blocking size. These include an if conditional, in the case, when the specific dimension is not dividable by the block variable. In the last run of the loop, there may be a case where the blocking size is actually bigger than the missing number of loop variables (dimension size - #loop variable), in which case the bs variable is set equal to the number of missing rowx/columns for that dimension. This secures that no segmentation error occur.\\
+
+The three inner loops basically runs over the according block sizes for the three dimension variables.
+
+\begin{lstlisting}[language=C++, caption=Function Prototype]
+int bsi=bs;
+int bsj=bs;
+int bsl=bs;
+
+for(int i1 = 0; i1 < m;i1+=bsi){
+	if(m-i1 < bs) {bsi=m-i1;
+	}
+	for(int l1 = 0; l1 < k;l1+=bsl){
+		if(k-l1 < bs) {bsl=k-l1;
+		}
+		for(int j1 = 0; j1 < n;j1+=bsj){
+			if(n-j1 < bs) {bsj=n-j1;
+			}
+			for(int i2 = 0; i2 < bsi; i2++){	
+				for(int l2 = 0; l2 < bsl;l2++){	
+					for(int j2 = 0; j2 < bsj; j2++){	
+							C[i1+i2][j1+j2] += A[i1+i2][l1+l2]*B[l1+l2][j1+j2];
+					}
+				}
+			}
+		}
+	}
+}
+\end{lstlisting}
+
+It would also be easy to implement different initial block sizes to experiment with different block dimensions and structures, i.e. a rectangle, but this is however not researched in our report. 
