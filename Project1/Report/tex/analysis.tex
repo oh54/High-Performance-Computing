@@ -1,1 +1,23 @@
-\subsection{Analysis}
+\subsubsection{Analyzer Tool}
+We expect better-performing permutations to have less cache misses.   To validate our hypotheses regarding cache hits we conducted a profiling experiment. That is, we fixed the matrix dimension size to 1000 which corresponds to ~24MB memory footprint and ran each of the six permutations with and without compiler optimizations (with and without -fast). The results were collected and viewed using Oracle Solaris Studio Performance Analyzer. To be able to make direct comparisons, we set the minimum runtime to zero and max iterations to one. This way each permutation is run for a single iteration and we can compare cache hits in absolute terms. To directly compare, the relative hit ratio is computed for each permutation for both compiler settings and for both the L1d and L2d cache. \\
+Table \ref{tab:tab1} shows the various hit ratios for the different permutations. It is clear, that both mkn and kmn has the fewest cache misses in the in L1 for both with and without fast. The hit ratios are worse in the L2 cache for the good performing mkn and kmn functions, but this is most likely due to the very few hits in that cache, since more of the L2 cache is used due to the fact of the faster computations. It is likewise found that nmk and mnk also perform averagely regarding the cache misses, which is also apparent in the memory foodprint since they are fluctuating between the bottom perfoming knm and nkm permutations and the top performing permutations of the mkn and kmn.
+
+
+\begin{table}[h!]
+\centering
+\caption{Displaying L1 and L2 cache hit ratio for the various permutations for a 1000x1000 matrix.}
+\label{Table:nat}
+\begin{tabular}{|l|l|l||l|l|l|}
+		\hline
+ & No compiler optimization & & With -fast & \\ \hline
+ & L1 hit ratio & L2 hit ratio & L1 hit ratio & L2 hit ratio \\ \hline
+mkn & 99.98\%& 75.96\% & 99.94\% & 0 hits  \\  \hline
+nkm & 90.22\% & 93.18\% &62.78\% & 93.53\% \\ \hline
+nmk & 95.19\% & 99.69\% &84.38\% & 87.60\%   \\ \hline
+mnk & 99.49\% & 87.43\% &84.46\% & 99.39\%  \\ \hline
+kmn & 99.97\% & 61.24\% &99.94\% & 75.96\%  \\ \hline
+knm & 90.20\% & 93.43\% &62.94\% & 93.08\%  \\ \hline
+\end{tabular}
+\end{table}
+
+Since there were no hits in L2 for the mkn permutation, we performed a computation for a 2000x2000 matrix, just to provide the whole picture. Here the L1 ratio is found to be 99.91\% and 86.67\% for the L2 cache.
