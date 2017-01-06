@@ -2,7 +2,7 @@
 
 Loop blocking is a technique to improve the memory access and data re-use, and thereby reduce the cache misses. To perform this, the matrices is essentially cut into smaller blocks, which are then solved, where more of the information can be reused, since it is already available in the cache. By implementing loop blocking, we intend to compare the performance of the new blocked loop function with the best performing permutation, which is mkn. The function prototype is almost identical to the earlier used with the new addition, that it takes a specified integer bs as an argument.
 
-\begin{lstlisting}[language=C++, caption=Function Prototype]
+\begin{lstlisting}[language=C++, caption=Blocked blk Prototype]
 void matmult_blk(int m, int n, int k, double ** A, double ** B, double ** C, int bs)
 \end{lstlisting}
 
@@ -10,7 +10,7 @@ To implement the blocking itself for arbitrarily sized matrices, we introduce 3 
 
 The three inner loops basically runs over the according block sizes for the three dimension variables.
 
-\begin{lstlisting}[language=C++, caption=Function Prototype]
+\begin{lstlisting}[language=C++, caption=Blocked Loop Function]
 int bsi=bs;
 int bsj=bs;
 int bsl=bs;
@@ -27,7 +27,8 @@ for(int i1 = 0; i1 < m;i1+=bsi){
 			for(int i2 = 0; i2 < bsi; i2++){	
 				for(int l2 = 0; l2 < bsl;l2++){	
 					for(int j2 = 0; j2 < bsj; j2++){	
-							C[i1+i2][j1+j2] += A[i1+i2][l1+l2]*B[l1+l2][j1+j2];
+						C[i1+i2][j1+j2] += 
+						A[i1+i2][l1+l2]*B[l1+l2][j1+j2];
 					}
 				}
 			}
@@ -46,15 +47,21 @@ An experiment with varying block sizes are run for a 2000x2000, which is display
 
 \begin{figure}[h!] 
 	\begin{center}
-		\includegraphics[width=0.8 \textwidth]{fig/optimalBlock.eps} 
+		\includegraphics[width=1.1 \textwidth]{fig/optimalBlock.eps} 
 		\caption{d}
 		\label{fig:optblock}
 	\end{center}
 \end{figure}
 
-The memory footprint for the blk and mkn is created, using a blocking size of 100. It should be noted, that the blk function is using the same loop structure as mkn, and they perform almost identical with matrices of small sizes. There are multiple factor here, and it can be seen that mkn performs surprisingly well. This is partly caused by the Sun Studio compiler, which is very optimized already. Furthermore, the mkn permutation is already performing the calculation in the best suitable way memory wise. The mkn function do however start to fall off in MFlops, once the matrix sizes increases above the L3 cache size, which makes sense, since there is a penalty on accessing the RAM, whereas the blk function largely avoids that, and hence has a more stable performance.
+The memory footprint for the blk and mkn is created, using a blocking size of 100. It should be noted, that the blk function is using the same loop structure as mkn. There are multiple factors in play here, and they perform almost identical with matrices of small sizes, but the mkn function do however perform better. This is probably caused by the additional loops and if statements in the blocking function. It can be seen that mkn performs surprisingly well for matrices of bigger sizes, and the blk function falls of a bit around 4 MB. The decent performance of the mkn function is partly caused by the Sun Studio compiler, which is very optimized already. Furthermore, the mkn permutation is already performing the calculation in the best suitable way memory wise. The mkn function do however start to fall off in MFlop/s, once the matrix sizes increases above the L3 cache size, which makes sense, since there is a penalty on accessing the RAM, whereas the blk function largely avoids that, and does not face the same downward trend. If we had run the experiment for bigger matrix sizes, the result may very well have been that the mkn function would continue to fall of, and the blk function would perform better on matrices of sizes above 1 GB.
+
+\begin{figure}[h!] 
+	\begin{center}
+		\includegraphics[width=1.1 \textwidth]{fig/permGraph_blk_mkn.eps} 
+		\caption{The memory footprint of the blk and mkn functions.}
+		\label{fig:mknblk}
+	\end{center}
+\end{figure}
 
 
-
-
-We are now ready to compare the blk function with the library function DGEMM, but it can be seen in the figure REF, that the performance of the library function is far superior to our novice function.
+We are now ready to compare the blk function with the library function DGEMM, but we quickly realize that these are not in the same league since the MFlop/s of the lib function is mostly above 20000. The performance of the library function is far superior to our own novice functions.
