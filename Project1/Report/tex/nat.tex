@@ -1,8 +1,5 @@
 \subsection{The Native Function}
 
-The Sun Studio compiler is used, and therefore the driver required is matmult\_c.studio.
-
-
 First, the goal is to write a native function, which performs a matrix-matrix multiplication. The shape has to be suitable for the operation, but it is arbitrary within the limits. It is defined based upon the dimensions m, n and k, as seen in figure \ref{fig:matrix1}, and the matrices A and B computed by the driver.
 
 \begin{figure}[h!] 
@@ -51,6 +48,18 @@ void matmult_lib(int m, int n, int k, double ** A, double ** B, double ** C){
 }
 \end{lstlisting}
 
-Comparing the two functions clearly display the limits of the native function. Running the experiment on the cluster for LOOK HERE
+Comparing the two functions clearly display the limits of the native function. Running the two function on the cluster for a few different matrix sizes.
+
+
+\begin{table}[h!]
+\centering
+\caption{This table displays the performance (MFlop/s) of the two functions matmult\_nat() and matmult\_lib() with a square matrix size of 512x512 and 2048x2048.}
+\label{Table:nat}
+\begin{tabular}{|l|l|l|}
+\hline m, n, k dimension  & nat() MFlop/s  & lib() MFlop/s \\ \hline
+	512 &	529.2 & 20767.1 \\ \hline	
+		2048 &	407.2 & 21521.5 \\ \hline	
+\end{tabular}
+
 
 

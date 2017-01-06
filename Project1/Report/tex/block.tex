@@ -36,4 +36,25 @@ for(int i1 = 0; i1 < m;i1+=bsi){
 }
 \end{lstlisting}
 
-It would also be easy to implement different initial block sizes to experiment with different block dimensions and structures, i.e. a rectangle, but this is however not researched in our report. 
+It would also be easy to implement different initial block sizes to experiment with different block dimensions and structures, i.e. a rectangle, but this is however not researched in our report. It could also be interesting to look into how the blocking perform with different type of rectangles, but these experiments have been performed on square matrices.
+
+
+\subsubsection{Block Performance and Comparison}
+
+Since the optimal blocking size varies with different matrix dimension, we seek to determine a good overall block size to use the same parameter for a memory footprint comparison with the best permutation mkn and the library function.\\
+An experiment with varying block sizes are run for a 2000x2000, which is displayed in figure \ref{fig:optblock}. The different blocksizes found can then also be compared to the L1, L2 and L3 caches. So the variations however small, clearly show the advantage of the correct block size and how it suits the different cache sizes. The peak right before the L2 cache is with a block size of 100. This block size is then chosen to use for the rest of the experiments.
+
+\begin{figure}[h!] 
+	\begin{center}
+		\includegraphics[width=0.8 \textwidth]{fig/optimalBlock.eps} 
+		\caption{d}
+		\label{fig:optblock}
+	\end{center}
+\end{figure}
+
+The memory footprint for the blk and mkn is created, using a blocking size of 100. It should be noted, that the blk function is using the same loop structure as mkn, and they perform almost identical with matrices of small sizes. There are multiple factor here, and it can be seen that mkn performs surprisingly well. This is partly caused by the Sun Studio compiler, which is very optimized already. Furthermore, the mkn permutation is already performing the calculation in the best suitable way memory wise. The mkn function do however start to fall off in MFlops, once the matrix sizes increases above the L3 cache size, which makes sense, since there is a penalty on accessing the RAM, whereas the blk function largely avoids that, and hence has a more stable performance.
+
+
+
+
+We are now ready to compare the blk function with the library function DGEMM, but it can be seen in the figure REF, that the performance of the library function is far superior to our novice function.
