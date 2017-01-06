@@ -1,0 +1,26 @@
+\subsection{The Permutations}
+
+Since the algorithm consists of three nested loops iterating over the three dimensions m, n and k, it is clear through basic combinatorics, that there is 3! = 6 possible ways to order the loops:\\
+mnk - mkn - kmn - knm - nmk - nkm \\
+The 6 permutations are implemented as separate functions in the library with names matmult\_NNN. The functions are obviously very similar to the already described nat function, but the function are however displayed below:
+
+\begin{lstlisting}[language=C++, caption=lib]
+void matmult_mkn(int m, int n, int k, double ** A, double ** B, double ** C){
+	for(int i = 0; i < m;i++){
+		for(int j = 0; j < n;j++){
+			C[i][j] = 0;		
+		}
+	}
+
+
+	for(int i = 0; i < m;i++){
+		for(int l = 0; l < k;l++){
+			for(int j = 0; j < n;j++){
+				C[i][j] += A[i][l]*B[l][j];
+			}
+		}
+	}
+}
+\end{lstlisting}
+
+Here, the C matrix is defined in an earlier loop. The mkn permutation is here shown, since it will also turn out to be an important permutation throughout this report.

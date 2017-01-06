@@ -1,9 +1,20 @@
-\subsection{Nat}
+\subsection{The Native Function}
 
 The Sun Studio compiler is used, and therefore the driver required is matmult\_c.studio.
 
 
-First, the goal is to write a native function, which performs a matrix-matrix multiplication. The shape has to be suitable for the operation, but it is arbitrary within the limits. Regarding matrix indexing, we use the double pointer representation A[i][j]. \\
+First, the goal is to write a native function, which performs a matrix-matrix multiplication. The shape has to be suitable for the operation, but it is arbitrary within the limits. It is defined based upon the dimensions m, n and k, as seen in figure \ref{fig:matrix1}, and the matrices A and B computed by the driver.
+
+\begin{figure}[h!] 
+	\begin{center}
+		\includegraphics[width=0.7 \textwidth]{fig/matrix1.PNG} 
+		\caption{Arbitrary matrix dimensions given in the assignment.}
+		\label{fig:matrix1}
+	\end{center}
+\end{figure}
+
+
+To create the code for such an operation, the native way is chosen, where the matrix is described using double pointers, i.e. A[i][j]. The choice of function prototypes and driver therefore follows, which is described in the given README file.  \\
 The general function prototype used is displayed below:
 \begin{lstlisting}[language=C++, caption=Function Prototype]
 void matmult_NNN(int m, int n, int k, double ** A, double ** B, double ** C)
@@ -11,7 +22,7 @@ void matmult_NNN(int m, int n, int k, double ** A, double ** B, double ** C)
 
 The function prototypes are all declared in the header file ass1\_lib.h. The functions themselves are described in the ass1\_lib.cpp file, where the ass1\_lib.h library is included. \\
 
-The native function takes the integer arguments m, n and k, as well as the double arguments **A, **B and **C. The double arguments are the actual matrices, which in the case of matrix A and B are generated within the supplied driver based on the submitted shape parameters. In the case of C, only the memory is allocated. To perform the matrix-matrix multiplication 3 nested for loops, one for each of the 3 shape parameters, are required. Three loop variables i, j and l are introduced for the matrix leading dimensions m, n and k. The C matrix has the leading dimensions of m and n, C[i][j]. The function is displayed below:
+The native function takes the integer arguments m, n and k, as well as the double arguments **A, **B ng}and **C. The double arguments are the actual matrices computed, which in the case of matrix A and B are generated within the supplied driver based on the submitted shape parameters. A dynamic memory allocation function is likewise implemented for the three matrices. In the case of C, only the memory is allocated. To perform the matrix-matrix multiplication 3 nested for loops, one for each of the 3 shape parameters, are required. Three loop variables i, j and l are introduced for the matrix leading dimensions m, n and k. The C matrix has the leading dimensions of m and n, C[i][j]. The function is displayed below:
 
 \begin{lstlisting}[language=C++, caption=Function Prototype]
 void matmult_nat(int m, int n, int k, double ** A, double ** B, double ** C){
@@ -29,10 +40,17 @@ void matmult_nat(int m, int n, int k, double ** A, double ** B, double ** C){
 Notice the += sign, which is caused by the fact, that when the function loops over l for a set (i,j), the multiplications for the different values of l are added together.
 
 
-\begin{figure}[h!] 
-	\begin{center}
-		\includegraphics[width=0.7 \textwidth]{Figurer/capmactual.png} 
-		\caption{The achieved portfolio returns plotted versus the return of the market. The CAPM fitted line is furthermore shown. }
-		\label{fig:capm}
-	\end{center}
-\end{figure}
+\subsection{DGEMM and Comparison}
+
+For comparison reasons, the important subroutine for matrix matrix multiplication DGEMM (Double Precision General Matrix Matrix) from the BLAS library is implemented in our system. The blas.h library is therefore included by using external C. The library function is implemented taking the same arguments as the nat function.
+
+\begin{lstlisting}[language=C++, caption=lib]
+void matmult_lib(int m, int n, int k, double ** A, double ** B, double ** C){
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
+  m, n, k, 1.0 , A[0], k, B[0], n, 0.0, C[0], n);
+}
+\end{lstlisting}
+
+Comparing the two functions clearly display the limits of the native function. Running the experiment on the cluster for LOOK HERE
+
+
