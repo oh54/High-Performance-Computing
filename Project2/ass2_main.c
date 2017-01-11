@@ -104,14 +104,20 @@ for(i = 4*Nt; i < 5*Nt; i++){
 }
 
 
-//printMat(f,N);
+printMat(f,N);
 
 while(checksum > d){
 checksum -= 1;
 
+jacobi_seq(u,uo,f,N,delta2);
 
+for(i = 0; i<N; i++){
+	for(j = 0; j<N; j++){
+		uo[i][j] = u[i][j];
+	}
 }
-
+}
+printMat(u,N);
 // Save the data
 
 /*
