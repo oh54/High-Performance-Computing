@@ -1,6 +1,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
+#include <string.h>
 #include "ass2_lib.h"
 
 double ** dmalloc_2d(int m, int n) {
@@ -44,13 +47,23 @@ double fnorm_squared(double ** u, double ** uo, int N){
 	return sum;
 }
 
-int main(){
+int main(int argc, char **argv){
+	// ./ass2_main <method type> <NN> <d> <kmax>
+	
+	int NN;
+	double d;
+	int kmax;
+	
+	sscanf(argv[2] , "%d", &NN);
+	sscanf(argv[3] , "%lf", &d);
+	sscanf(argv[4] , "%d", &kmax);
+
 	// init loop variables
 	int i, j;
 
 	// Size of square PHYSICAL domain \
 	find a way to input this from command line like in assignment 1
-	int NN = 20;
+	
 
 	// Size of square NUMERICAL domain
 	int N = NN + 2;
@@ -59,11 +72,10 @@ int main(){
 	double delta2inv = 1/delta2; // 1/delta2
 	double Nt = N/6.0; // number of points corresponding to a third in physical units
 
-	double d = 0.001; // threshold
 	d = d*d;
 	double checksum = 1000;
 	int k = 0;
-	int kmax = 10000;
+	
 
 	// init matrices, u is the newest version, uo i u old, and f is f
 	double ** u, ** uo, ** f;
@@ -107,20 +119,42 @@ int main(){
 
 	//printMat(f,N);
 
-	while(checksum > d && k < kmax){
-//		checksum -= 1000;
-
-//		jacobi_seq(u,uo,f,N,delta2);
-		gauss_seidel(u,f,N,delta2);
-		checksum = fnorm_squared(u,uo,N);
-
-		for(i = 0; i<N; i++){
-			for(j = 0; j<N; j++){
-				uo[i][j] = u[i][j];
+	if(strcmp(argv[1], "jacobi") == 0){
+		printf("DOING JACOBI\n");
+		clock_t startc = clock();
+		while(checksum > d && k < kmax){
+			jacobi_seq(u,uo,f,N,delta2);
+			checksum = fnorm_squared(u,uo,N);
+			for(i = 0; i<N; i++){
+				for(j = 0; j<N; j++){
+					uo[i][j] = u[i][j];
+				}
 			}
+			k++;
 		}
-		k++;
+		clock_t endc = clock();
+		printf("%f\n", (float)(endc - startc) / CLOCKS_PER_SEC);
 	}
+
+	if(strcmp(argv[1], "gauss") == 0){
+		printf("DOING GAUSS-SEIDEL\n");
+		clock_t startc = clock();
+		while(checksum > d && k < kmax){
+			gauss_seidel(u,f,N,delta2);
+		
+			checksum = fnorm_squared(u,uo,N);
+
+			for(i = 0; i<N; i++){
+				for(j = 0; j<N; j++){
+					uo[i][j] = u[i][j];
+				}
+			}
+			k++;
+		}
+		clock_t endc = clock();
+		printf("%f\n", (float)(endc - startc) / CLOCKS_PER_SEC);
+	}
+
 //	printMat(u,N);
 	// Save the data
 
@@ -128,7 +162,7 @@ int main(){
 	The real code should be here. While loop that checks if change from uo to u is small enough to be accepted (solution has converged). Jacobi should be implemented as a sub-routine in a separate function
 	*/
 
-printf("k is: %i \n",k);
+	//printf("k is: %i \n",k);
 
 	dfree_2d(u);
 	dfree_2d(uo);

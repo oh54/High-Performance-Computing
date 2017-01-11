@@ -1,5 +1,6 @@
-TARGET = ass2_main_jacobi
-OBJS = ass2_main.o jacobi_seq.o
+TARGET = ass2_main
+
+OBJS = ass2_main.o jacobi_seq.o gauss_seidel.o
 CXX = suncc
 
 $(TARGET): $(OBJS)
