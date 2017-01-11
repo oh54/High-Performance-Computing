@@ -6,4 +6,4 @@ void gauss_seidel(double ** u, double ** f, int N, double delta2){
 			u[i][j] = 0.25*(u[i-1][j] + u[i+1][j] + u[i][j-1] + u[i][j+1] + delta2*f[i][j]);
 		}
 	}
-};
+}

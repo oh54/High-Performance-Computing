@@ -45,7 +45,6 @@ double fnorm_squared(double ** u, double ** uo, int N){
 }
 
 int main(){
-
 	// init loop variables
 	int i, j;
 
@@ -61,7 +60,10 @@ int main(){
 	double Nt = N/6.0; // number of points corresponding to a third in physical units
 
 	double d = 0.001; // threshold
+	d = d*d;
 	double checksum = 1000;
+	int k = 0;
+	int kmax = 10000;
 
 	// init matrices, u is the newest version, uo i u old, and f is f
 	double ** u, ** uo, ** f;
@@ -103,27 +105,30 @@ int main(){
 	}
 
 
-	printMat(f,N);
+	//printMat(f,N);
 
-	while(checksum > d){
-		checksum -= 1;
+	while(checksum > d && k < kmax){
+//		checksum -= 1000;
 
-		jacobi_seq(u,uo,f,N,delta2);
+//		jacobi_seq(u,uo,f,N,delta2);
+		gauss_seidel(u,f,N,delta2);
+		checksum = fnorm_squared(u,uo,N);
 
 		for(i = 0; i<N; i++){
 			for(j = 0; j<N; j++){
 				uo[i][j] = u[i][j];
 			}
 		}
+		k++;
 	}
-	printMat(u,N);
+//	printMat(u,N);
 	// Save the data
 
 	/*
 	The real code should be here. While loop that checks if change from uo to u is small enough to be accepted (solution has converged). Jacobi should be implemented as a sub-routine in a separate function
 	*/
 
-
+printf("k is: %i \n",k);
 
 	dfree_2d(u);
 	dfree_2d(uo);
