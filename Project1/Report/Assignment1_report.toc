@@ -1,7 +1,12 @@
 \select@language {english}
 \contentsline {section}{\numberline {1}Introduction}{1}
+\contentsline {subsection}{\numberline {1.1}Computing Specifications}{1}
 \contentsline {section}{\numberline {2}Assignment}{1}
-\contentsline {subsection}{\numberline {2.1}Nat}{1}
-\contentsline {subsection}{\numberline {2.2}Comparing the permutations}{1}
-\contentsline {subsubsection}{\numberline {2.2.1}Analyzer tool}{2}
-\contentsline {section}{\numberline {3}Conclusion}{3}
+\contentsline {subsection}{\numberline {2.1}The Native Function}{1}
+\contentsline {subsection}{\numberline {2.2}DGEMM and Comparison}{2}
+\contentsline {subsection}{\numberline {2.3}The Permutations}{3}
+\contentsline {subsection}{\numberline {2.4}Performance analysis}{3}
+\contentsline {subsubsection}{\numberline {2.4.1}Analyzer Tool}{5}
+\contentsline {subsection}{\numberline {2.5}Loop Blocking}{7}
+\contentsline {subsubsection}{\numberline {2.5.1}Block Performance and Comparison}{8}
+\contentsline {section}{\numberline {3}Conclusion}{9}

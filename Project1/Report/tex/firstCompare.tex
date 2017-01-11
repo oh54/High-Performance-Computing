@@ -1,4 +1,4 @@
-\subsection{Comparing the permutations}
+\subsection{Performance analysis}
 The performance of the six different functions resulting from the possibilities of permuting mnk are tested with square matrices with memory footprints ranging from a few kB to hundreds of MB. The results are seen in figure \ref{fig:permGraph_none} with no compiler options. All six permutations perform equally well when the memory footprint is less than the L2 cache. For memory footprints larger than L2, the permutations with the loop over $n$ maintain the same performance, while the other four permutations have a significant reduction of performance. This is due to the fact that $m$ is the row index for matrices B and C, and that works well with the C language which is row major, meaning that the caches lines go along the rows of the matrices. The performance does not degrade after exceeding L3 which shows that program does not utilize the caches optimally. If that was the case, the smaller bandwidth between the memory and the processor would cause a significant drop in the performance when the memory footprint exceeds L3.
 \begin{figure}
 \centering
@@ -12,49 +12,34 @@ To investigate this, the same graph is produced, but this time the $\mathrm{-fas
 \centering
 \includegraphics[width = 1.1\textwidth]{fig/permGraph_fast.eps}
 \caption{The performance of the different permutations versus the memory footprint with compiler option $\mathrm{-fast}$ activated. L1, L2, and L3 caches shown as the vertical black dotted lines.}
-\label{fig:comp1}
+\label{fig:permGraph_fast}
+\end{figure}
+
+One function prom each pair sharing the same inner loop is selected to investigate the effect of the different compiler options on the performance. Three options are chosen: General optimization -xO5, loop unrolling -unroll=8, and prefetching -xprefetch\_level=3. The three plots are seen in figure \ref{fig:compGraph}. As seen, neither prefetching nor unrolling does anything measureable to the performance, while -xO5 is responsible for the entire performance increase from the -fast option. We expected a performance increase from the unrolling because the code only specifies one multiplication per loop, and unrolling should decrease the relative amount of overhead calculations, thus increasing the performance even for small memory footprints, but it is not observed. This could be because the hard-coded unrolling value is not optimal for all matrix sizes, and thus it does not give a performance increase. The -fast option does unrolling, but probably with more dynamically. The prefetching was expected to give an increased performance for memory footprints exceeding the L3 cache, but that is not observed either, again most likely due to something else being the bottleneck, as is also evident from the fact that performance with no options is more or less constant for all memory footprints tested here.
+
+In conclusion, the compiler optimizations can, for the right loop order, increase the performance by a factor of 4, but it was not possible to observe the effect from the individual options enabled alone.
+
+\begin{figure}
+\centering
+\begin{subfigure}{1\textwidth}
+\includegraphics[width = \textwidth]{fig/compGraph_mkn.eps}
+\caption{}
+\label{fig:compGraph_mkn}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+\includegraphics[width = \textwidth]{fig/compGraph_knm.eps}
+\caption{}
+\label{fig:compGraph_knm}
+\end{subfigure}
+
+\begin{subfigure}{1\textwidth}
+\includegraphics[width = \textwidth]{fig/compGraph_mnk.eps}
+\caption{}
+\label{fig:compGraph_mnk}
+\end{subfigure}
+\caption{Performance versus memory footprint with different compiler options for (\subref{fig:compGraph_mkn}) mkn, (\subref{fig:compGraph_knm}) knm, and (\subref{fig:compGraph_mnk}) mnk.}
+\label{fig:compGraph}
 \end{figure}
 
 
-
-\subsubsection{Analyzer tool}
-We expect better-performing permutations to have less cache misses.   To validate our hypotheses regarding cache hits we conducted a profiling experiment. That is, we fixed the matrix dimension size to 724 which corresponds to ~12MB memory footprint, ran each of the six permutations (without compiler optimizations) using the collect command and viewed the results using Oracle Solaris Studio Performance Analyzer. To be able to make direct comparisons, we set the minimum runtime to zero and max iterations to one. This way each permutation is run for a single iteration and we can compare cache hits in absolute terms. \\
-Level 1 and 2 cache hits and misses as well as CPU time of the permutations are presented in table \ref{tab:tab1}.
-\begin{center}
-\captionof{table}{Cache counters in millions with 12MB memory footprint} \label{tab:tab1} 
-\begin{tabular}{ |c|c|c|c|c|c| } 
-\hline
- & L1d hit & L1d miss & L2 hit & L2 miss & CPU time \\ 
-\hline
-nkm & 6849 & 755 & 704 & 50 & 2.410 \\  
-\hline
-nmk & 7229 & 373 & 373 & 1 & 2.030 \\ 
-\hline
-mkn & 7599 & 0 & 0 & 0 & 1.810 \\ 
-\hline
-mnk & 7229 & 376 & 328 & 47 & 2.310 \\ 
-\hline
-knm & 6849 & 755 & 704 & 51 & 2.350 \\ 
-\hline
-kmn & 7599 & 0 & 0 & 0 & 1.820 \\ 
-\hline
-\end{tabular}
-\end{center}
-
-Interpret results of table
-
-
-When the memory footprint 
-
-
-
-\begin{itemize}
-\item hpcintro queue node cpu information
-\item Introduce functions
-\item Show library vs. native
-\item introduce the permutations WITHOUT -fast and show the performance vs. memory footprint for all permutations
-\item Optimize by compiler options (-fast, -O3, -prefetch etc. etc.)
-\item Performace Analyzer tool experiment(s), relate results to  memory footprint-performance plot.
-\item Blocking and find optimum block size
-\item Compare blocking to the best w/o blocking
-\end{itemize}
