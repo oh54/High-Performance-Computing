@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <math.h>
+#include "ass2_lib.h"
 
 double ** dmalloc_2d(int m, int n) {
 if (m <= 0 || n <= 0) return NULL;
@@ -33,7 +34,7 @@ for(i = 0; i < N; i++){
 }
 }
 
-double checksum_squared(double ** u, double ** uo, int N){
+double fnorm_squared(double ** u, double ** uo, int N){
 int i,j;
 double sum = 0;
 for(i = 1; i <N-1; i++){
@@ -57,7 +58,11 @@ int NN = 20;
 int N = NN + 2;
 double delta = 2/N; // distance between points
 double delta2 = delta*delta; // delta squared
+double delta2inv = 1/delta2; // 1/delta2
 double Nt = N/6.0; // number of points corresponding to a third in physical units
+
+double d = 0.001; // threshold
+double checksum = 1000;
 
 // init matrices, u is the newest version, uo i u old, and f is f
 double ** u, ** uo, ** f;
@@ -78,6 +83,12 @@ for(j = 0; j < N; j++) uo[0][j] = 20;
 for(i = 0; i < N; i++) uo[i][0] = 20;
 for(i = 0; i < N; i++) uo[i][N-1] = 20;
 
+//setting u = uo;
+for(i = 0; i<N; i++){
+	for(j = 0; j<N; j++){
+		u[i][j] = uo[i][j];
+	}
+}
 //printMat(uo,N);
 
 // defining the f matrix
@@ -95,9 +106,19 @@ for(i = 4*Nt; i < 5*Nt; i++){
 
 //printMat(f,N);
 
+while(checksum > d){
+checksum -= 1;
+
+
+}
+
+// Save the data
+
 /*
 The real code should be here. While loop that checks if change from uo to u is small enough to be accepted (solution has converged). Jacobi should be implemented as a sub-routine in a separate function
 */
+
+
 
 dfree_2d(u);
 dfree_2d(uo);
