@@ -55,7 +55,7 @@ int main(){
 
 	// Size of square NUMERICAL domain
 	int N = NN + 2;
-	double delta = 2/N; // distance between points
+	double delta = 2.0/N; // distance between points
 	double delta2 = delta*delta; // delta squared
 	double delta2inv = 1/delta2; // 1/delta2
 	double Nt = N/6.0; // number of points corresponding to a third in physical units
