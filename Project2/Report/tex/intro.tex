@@ -1,5 +1,33 @@
-The goal of this assignment is to develop different matrix-matrix multiplication functions and to analyze and compare their performance.
+The goal of this assignment is to implement sequential versions of two iterative ODE solvers, namely the Jacobi method and the Gauss-Seidel method. The Jacobi method is parallelized using openMP and the scalability is compared to the parallelization of the calculation of the Mandelbrot set. Finally a method for parallelizing the Gauss.Seidel method is discussed but not implemented.
 
 \subsection{Computing Specifications}
-Unless otherwise stated a lot of the specifications are fixed throughout the report. The code is written in c++ and compiled with the Sun Studio compiler. We therefore use the matmult\_c.studio driver. All the experiments are run on the hpcintro cluster on a single node with one processors per node (ppn), which is specified in the submit.sh script. All the nodes on the cluster are identical. The makefile used is the supplied sunCC makefile with CXX = sunCC for c++ modified for the different cases.
-
+Unless otherwise stated a lot of the specifications are fixed throughout the report. The code is written in C and compiled with the Sun Studio compiler. All the experiments are run on the hpcintro queue on a single node with one processors per node (ppn), which is specified in the submit.sh script. All the nodes on the cluster are identical, and the full specifications are given in talbe \ref{tab:spec}.
+\begin{table}
+\centering
+\begin{tabular}{l l}
+Architecture:     &     x86\_64 \\ \hline
+CPU op-mode(s):    &    32-bit, 64-bit\\ \hline
+Byte Order:         &   Little Endian\\ \hline
+CPU(s):             &   20\\ \hline
+On-line CPU(s) list:&   0-19\\ \hline
+Thread(s) per core: &   1\\ \hline
+Core(s) per socket: &   10\\ \hline
+Socket(s):          &   2\\ \hline
+NUMA node(s):       &   2\\ \hline
+Vendor ID:          &   GenuineIntel\\ \hline
+CPU family:         &   6\\ \hline
+Model:              &   63\\ \hline
+Stepping:           &   2\\ \hline
+CPU MHz:            &   2601.000\\ \hline
+BogoMIPS:           &   5187.68\\ \hline
+Virtualization:     &   VT-x\\ \hline
+L1d cache:          &   32kB\\ \hline
+L1i cache:          &   32kB\\ \hline
+L2 cache:           &   256kB\\ \hline
+L3 cache:           &   25600kB\\ \hline
+NUMA node0 CPU(s):  &   0-9\\ \hline
+NUMA node1 CPU(s):  &   10-19\\
+\end{tabular}
+\caption{Table of the full machine specifications.}
+\label{tab:spec}
+\end{table}
