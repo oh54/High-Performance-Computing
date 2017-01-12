@@ -1,3 +1,4 @@
+#!/bin/sh
 module load studio
 make clean_all
 make

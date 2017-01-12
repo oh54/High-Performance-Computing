@@ -44,18 +44,18 @@ double fnorm_squared(double ** u, double ** uo, int N){
 			sum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
 		}
 	}
-	return sum;
+	return sum / (N*N);
 }
 
 int main(int argc, char **argv){
 	// ./ass2_main <method type> <NN> <d> <kmax>
 	
 	int NN;
-	double d;
+	double dd;
 	int kmax;
 	
 	sscanf(argv[2] , "%d", &NN);
-	sscanf(argv[3] , "%lf", &d);
+	sscanf(argv[3] , "%lf", &dd);
 	sscanf(argv[4] , "%d", &kmax);
 
 	// init loop variables
@@ -72,7 +72,7 @@ int main(int argc, char **argv){
 	double delta2inv = 1/delta2; // 1/delta2
 	double Nt = N/6.0; // number of points corresponding to a third in physical units
 
-	d = d*d;
+	double d = dd*dd;
 	double checksum = 1000;
 	int k = 0;
 	
@@ -120,7 +120,7 @@ int main(int argc, char **argv){
 	//printMat(f,N);
 
 	if(strcmp(argv[1], "jacobi") == 0){
-		printf("DOING JACOBI\n");
+		//printf("DOING JACOBI\n");
 		clock_t startc = clock();
 		while(checksum > d && k < kmax){
 			jacobi_seq(u,uo,f,N,delta2);
@@ -133,11 +133,11 @@ int main(int argc, char **argv){
 			k++;
 		}
 		clock_t endc = clock();
-		printf("%f\n", (float)(endc - startc) / CLOCKS_PER_SEC);
+		printf("%s, %f, %i, %.20f, %i, \n", "JAC", ((float)(endc - startc) / CLOCKS_PER_SEC), N, dd, k);
 	}
 
 	if(strcmp(argv[1], "gauss") == 0){
-		printf("DOING GAUSS-SEIDEL\n");
+		//printf("DOING GAUSS-SEIDEL\n");
 		clock_t startc = clock();
 		while(checksum > d && k < kmax){
 			gauss_seidel(u,f,N,delta2);
@@ -152,7 +152,8 @@ int main(int argc, char **argv){
 			k++;
 		}
 		clock_t endc = clock();
-		printf("%f\n", (float)(endc - startc) / CLOCKS_PER_SEC);
+		printf("%s, %f, %i, %.20f, %i, \n", "G-S", (float)(endc - startc) / CLOCKS_PER_SEC, N, dd, k);
+		
 	}
 
 //	printMat(u,N);
