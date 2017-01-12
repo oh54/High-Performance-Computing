@@ -210,7 +210,7 @@ int main(int argc, char **argv){
 			k++;
 		}
 		double omp_time = omp_get_wtime() - omp_s;
-		int thread = omp_get_thread_num()
+		int thread = omp_get_thread_num();
 		printf("%s, ", "OMP");
 		printf("%f, ", omp_time);
 		printf("%i, %.20f, %i, %i\n", N, dd, k, thread);
@@ -242,7 +242,7 @@ int main(int argc, char **argv){
 			k++;
 		}
 		double omp_time = omp_get_wtime() - omp_s;
-		int thread = omp_get_thread_num()
+		int thread = omp_get_thread_num();
 		printf("%s, ", "OMP");
 		printf("%f, ", omp_time);
 		printf("%i, %.20f, %i, %i\n", N, dd, k, thread);
