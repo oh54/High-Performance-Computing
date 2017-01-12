@@ -40,3 +40,12 @@ The two functions are run with a fixed size of $N=100$, and $k_\mathrm{max}$ lar
 \caption{The convergence of the Jacobi method and the Gauss-Seidel method with changing threshold.}
 \label{fig:itd}
 \end{figure}
+
+The performance of the two sequential functions are analyzed by comparing the number of point updates per second. The program is forced to run for at least three seconds to get a reliable timing. The resulting graphs is shown in figure \ref{fig:seq_perf}. For small matrices the Jacobi method is $\sim$ twice as fast as the Gauss-Seidel method. This is due to the fact that the Gauss-Seidel method read and write in the same array, which cause some memory "clogging" in the caches. For matrices exceeding the L3 cache, the Jacobi method slows down significantly, due to the smaller bandwidth to/from memory compared to the caches. The Gauss-Seidel method is reduced as well for the same reasons, but not nearly as significantly due to the memory clogging already taking place in the caches. However, as seen on figure \ref{fig:itd}, the Gauss-Seidel method requires half as many iterations to converge to the same precision, making it faster in wall clock time.
+
+\begin{figure}
+\centering
+\includegraphics[width = 1.1\textwidth]{fig/seq_perf.eps}
+\caption{The performance of the two sequential functions with changing domain size. The black dashed lines represent the cache sizes of the CPU.}
+\label{fig:seq_perf}
+\end{figure}
