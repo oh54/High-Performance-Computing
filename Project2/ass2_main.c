@@ -47,42 +47,11 @@ double fnorm_squared(double ** u, double ** uo, int N){
 	return sum / (N*N);
 }
 
-int main(int argc, char **argv){
-	// ./ass2_main <method type> <NN> <d> <kmax>
-	
-	int NN;
-	double dd;
-	int kmax;
-	
-	sscanf(argv[2] , "%d", &NN);
-	sscanf(argv[3] , "%lf", &dd);
-	sscanf(argv[4] , "%d", &kmax);
+void initialize_matrices(double ** u, double ** uo, double ** f, int N, double Nt){
 
+	
 	// init loop variables
 	int i, j;
-
-	// Size of square PHYSICAL domain \
-	find a way to input this from command line like in assignment 1
-	
-
-	// Size of square NUMERICAL domain
-	int N = NN + 2;
-	double delta = 2.0/N; // distance between points
-	double delta2 = delta*delta; // delta squared
-	double delta2inv = 1/delta2; // 1/delta2
-	double Nt = N/6.0; // number of points corresponding to a third in physical units
-
-	double d = dd*dd;
-	double checksum = 1000;
-	int k = 0;
-	
-
-	// init matrices, u is the newest version, uo i u old, and f is f
-	double ** u, ** uo, ** f;
-
-	u = dmalloc_2d(N,N);
-	uo = dmalloc_2d(N,N);
-	f = dmalloc_2d(N,N);
 
 	// define uo as zeros\
 	uo[x][0] = 0 i.e. outer wall
@@ -117,42 +86,102 @@ int main(int argc, char **argv){
 	}
 
 
-	//printMat(f,N);
+}
+
+int main(int argc, char **argv){
+	// ./ass2_main <method type> <NN> <d> <kmax>
+	
+	int NN;
+	double dd;
+	int kmax;
+	
+	
+	sscanf(argv[2] , "%d", &NN);
+	sscanf(argv[3] , "%lf", &dd);
+	sscanf(argv[4] , "%d", &kmax);
+
+	double d = dd*dd;
+	// Size of square NUMERICAL domain
+	int N = NN + 2;
+	double delta = 2.0/N; // distance between points
+	double delta2 = delta*delta; // delta squared
+	double delta2inv = 1/delta2; // 1/delta2
+	double Nt = N/6.0; // number of points corresponding to a third in physical units	
+
+	double checksum = 1000;
+	int k = 0;
+
+	double ** u, ** uo, ** f;
+	u = dmalloc_2d(N,N);
+	uo = dmalloc_2d(N,N);
+	f = dmalloc_2d(N,N);
+
+	//initialize_matrices(u, uo, f, N, Nt);
+	int i, j;
+	struct timeval  tv1, tv2;
+	double runtime;
+	int nruns;
 
 	if(strcmp(argv[1], "jacobi") == 0){
-		//printf("DOING JACOBI\n");
-		clock_t startc = clock();
-		while(checksum > d && k < kmax){
-			jacobi_seq(u,uo,f,N,delta2);
-			checksum = fnorm_squared(u,uo,N);
-			for(i = 0; i<N; i++){
-				for(j = 0; j<N; j++){
-					uo[i][j] = u[i][j];
+
+		runtime = 0.0;
+		nruns = 0;
+		
+		while(runtime <= 3.0){
+			k = 0;
+			checksum = 1000;
+			initialize_matrices(u, uo, f, N, Nt);			
+			
+			gettimeofday(&tv1, NULL);
+			while(checksum > d && k < kmax){
+				jacobi_seq(u,uo,f,N,delta2);
+				checksum = fnorm_squared(u,uo,N);
+				for(i = 0; i<N; i++){
+					for(j = 0; j<N; j++){
+						uo[i][j] = u[i][j];
+					}
 				}
+				k++;
 			}
-			k++;
+			gettimeofday(&tv2, NULL);
+			runtime += (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
+			nruns++;
 		}
-		clock_t endc = clock();
-		printf("%s, %f, %i, %.20f, %i, \n", "JAC", ((float)(endc - startc) / CLOCKS_PER_SEC), N, dd, k);
+		printf("%s, ", "JAC");
+		printf("%f, ", runtime);
+		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
+		
 	}
 
 	if(strcmp(argv[1], "gauss") == 0){
-		//printf("DOING GAUSS-SEIDEL\n");
-		clock_t startc = clock();
-		while(checksum > d && k < kmax){
-			gauss_seidel(u,f,N,delta2);
-		
-			checksum = fnorm_squared(u,uo,N);
 
-			for(i = 0; i<N; i++){
-				for(j = 0; j<N; j++){
-					uo[i][j] = u[i][j];
+		runtime = 0.0;
+		nruns = 0;
+
+		while(runtime <= 3.0){
+			k = 0;
+			checksum = 1000;
+			initialize_matrices(u, uo, f, N, Nt);			
+			
+			gettimeofday(&tv1, NULL);
+			while(checksum > d && k < kmax){
+				gauss_seidel(u,f,N,delta2);
+				checksum = fnorm_squared(u,uo,N);
+				for(i = 0; i<N; i++){
+					for(j = 0; j<N; j++){
+						uo[i][j] = u[i][j];
+					}
 				}
+				k++;
 			}
-			k++;
+			gettimeofday(&tv2, NULL);
+			runtime += (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
+			nruns++;
 		}
-		clock_t endc = clock();
-		printf("%s, %f, %i, %.20f, %i, \n", "G-S", (float)(endc - startc) / CLOCKS_PER_SEC, N, dd, k);
+		
+		printf("%s, ", "JAC");
+		printf("%f, ", runtime);
+		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
 		
 	}
 
