@@ -12,8 +12,13 @@
 \section{Assignment}
 
 
+\input{tex/ex12.tex}
+
+\input{tex/literaturegauss.tex}
+
+
 
 
 \section{Conclusion}
-We have implemented 6 functions all computing a matrix matrix product, and each having a different permutation of loop orders. Using different compiler optimizations, the best one was found to be mkn, topping at $\sim 1600$ MFlop/s, opposed to the DGEMM library function which tops at $\sim 22000$ MFlop/s. Cache hits and misses were analyzed to highlight the difference in performance between the permutations, and the analysis showed that the quickest functions has the highest hit-to-miss-ratio as expected. Finally, blocking was implemented as an attempt to better the performance degradation from the memory footprint exceeding the L3 cache size. The implementation was successful, but performance-wise, it only showed a minor improvement as opposed to the best non-blocked version. This is partly due to the Sun Studio compiler doing a great job at prefetching. However, we expect that the blocked version will be better than the non-blocked version for matrices larger than the one tested here.
+
 \end{document}
