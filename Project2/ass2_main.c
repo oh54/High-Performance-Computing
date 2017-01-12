@@ -184,19 +184,11 @@ int main(int argc, char **argv){
 		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
 		
 	}
-
-	if(strcmp(argv[1], "omptest") == 0){
-		#pragma omp parallel 
-		{
-			printf("Hello world!\n");
-		} /* end par */
-
-	}
-
+	
 	if(strcmp(argv[1], "omp") == 0){
 		runtime = 0.0;
 		nruns = 0;
-		#pragma omp parallel default(none) shared(u,uo,f,N,delta2,d,kmax,checksum) 
+		#pragma omp parallel default(none) shared(u,uo,f,N,delta2,d,kmax,checksum,tv1,tv2,nruns,runtime,k,Nt) private(i,j)
 		{
 			while(runtime <= 3.0){
 				k = 0;
@@ -226,6 +218,7 @@ int main(int argc, char **argv){
 		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
 
 	}
+	
 
 //	printMat(u,N);
 	// Save the data
