@@ -40,7 +40,7 @@ void printMat(double ** A, int N){
 double fnorm_squared(double ** u, double ** uo, int N){
 	int i,j;
 	double sum = 0;
-	#pragma omp for	private(i,j) 
+	#pragma omp for	private(i,j)  reduction(+:sum)
 	for(i = 1; i <N-1; i++){
 		for(j = 1; j<N-1; j++){
 			sum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
@@ -226,21 +226,23 @@ int main(int argc, char **argv){
 		initialize_matrices(u, uo, f, N, Nt);			
 		
 		double omp_s = omp_get_wtime();
-		while(checksum > d && k < kmax){
-			#pragma omp parallel default(none) shared(u,uo,f,N,delta2) private(i,j)
-			{
-				jacobi_seq(u,uo,f,N,delta2);
-			} // end parallel
-			checksum = fnorm_squared(u,uo,N);
-			#pragma omp for	private(i,j) 
-			for(i = 0; i<N; i++){
-				for(j = 0; j<N; j++){
-					uo[i][j] = u[i][j];
-				}
-			} 
 			
-			k++;
-		}
+			while(checksum > d && k < kmax){
+				#pragma omp parallel default(none) shared	(u,uo,f,N,delta2, checksum, k) private(i,j)
+				{
+					jacobi_seq(u,uo,f,N,delta2);
+					
+					checksum = fnorm_squared(u,uo,N);
+					#pragma omp for	private(i,j) 
+					for(i = 0; i<N; i++){
+						for(j = 0; j<N; j++){
+							uo[i][j] = u[i][j];
+						}
+					} 
+					
+				} // end parallel
+				k++;
+			} // end while 
 		double omp_time = omp_get_wtime() - omp_s;
 		int thread = omp_get_max_threads();
 		printf("%s, ", "OMP");
