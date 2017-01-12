@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <string.h>
 #include "ass2_lib.h"
+#include <omp.h>
 
 double ** dmalloc_2d(int m, int n) {
 	if (m <= 0 || n <= 0) return NULL;
@@ -187,32 +188,32 @@ int main(int argc, char **argv){
 	
 	if(strcmp(argv[1], "omp") == 0){
 		runtime = 0.0;
-		nruns = 0;
-		#pragma omp parallel default(none) shared(u,uo,f,N,delta2,d,kmax,checksum,tv1,tv2,nruns,runtime,k,Nt) private(i,j)
-		{
-			while(runtime <= 3.0){
-				k = 0;
-				checksum = 1000;
-				initialize_matrices(u, uo, f, N, Nt);			
-			
-				gettimeofday(&tv1, NULL);
-				while(checksum > d && k < kmax){
-					jacobi_seq(u,uo,f,N,delta2);
-					checksum = fnorm_squared(u,uo,N);
-					#pragma omp for private(i,j)
-					for(i = 0; i<N; i++){
-						for(j = 0; j<N; j++){
-							uo[i][j] = u[i][j];
-						}
-					} 
-					// end of omp for
-					k++;
+	
+		k = 0;
+		checksum = 1000;
+		initialize_matrices(u, uo, f, N, Nt);			
+		gettimeofday(&tv1, NULL);
+		
+		double omp_s = omp_get_wtime();
+		while(checksum > d && k < kmax){
+			#pragma omp parallel default(none) shared(u,uo,f,N,delta2) private(i,j)
+			{
+				jacobi_seq(u,uo,f,N,delta2);
+			} // end parallel
+			checksum = fnorm_squared(u,uo,N);
+			for(i = 0; i<N; i++){
+				for(j = 0; j<N; j++){
+					uo[i][j] = u[i][j];
 				}
-				gettimeofday(&tv2, NULL);
-				runtime += (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
-				nruns++;
-			}
-		} // end of omp parallel
+			} 
+			
+			k++;
+		}
+		double omp_time = omp_get_wtime() - omp_s;
+		gettimeofday(&tv2, NULL);
+		runtime += (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
+		printf("OMP TIME %f\n", omp_time);
+		
 		printf("%s, ", "OMP");
 		printf("%f, ", runtime);
 		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
