@@ -192,7 +192,6 @@ int main(int argc, char **argv){
 		k = 0;
 		checksum = 1000;
 		initialize_matrices(u, uo, f, N, Nt);			
-		gettimeofday(&tv1, NULL);
 		
 		double omp_s = omp_get_wtime();
 		while(checksum > d && k < kmax){
@@ -210,13 +209,10 @@ int main(int argc, char **argv){
 			k++;
 		}
 		double omp_time = omp_get_wtime() - omp_s;
-		gettimeofday(&tv2, NULL);
-		runtime += (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
-		printf("OMP TIME %f\n", omp_time);
 		
 		printf("%s, ", "OMP");
-		printf("%f, ", runtime);
-		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
+		printf("%f, ", omp_time);
+		printf("%i, %.20f, %i\n", N, dd, k);
 
 	}
 	
