@@ -1,5 +1,4 @@
 TARGET = ass2_main
-
 OBJS = ass2_main.o jacobi_seq.o gauss_seidel.o
 CC = suncc
 CFLAGS = -g -fast -xopenmp
