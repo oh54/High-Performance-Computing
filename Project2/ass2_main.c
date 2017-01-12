@@ -149,7 +149,7 @@ int main(int argc, char **argv){
 			nruns++;
 		}
 		printf("%s, ", "JAC");
-		printf("%f, ", runtime);
+		printf("%f, ", (double) runtime / nruns);
 		printf("%i, %.20f, %i, %i\n", N, dd, k, k*nruns);
 		
 	}

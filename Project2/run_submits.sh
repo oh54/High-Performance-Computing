@@ -4,4 +4,6 @@ make clean_all
 make
 
 #qsub submit-seqd.sh -o seqd_o.txt -e seqd_e.txt
-qsub submit-seqn.sh -o seqn_o.txt -e seqn_e.txt
+#qsub submit-seqn.sh -o seqn_o.txt -e seqn_e.txt
+
+qsub submit-parn.sh -o parn_o.txt -e parn_e.txt
