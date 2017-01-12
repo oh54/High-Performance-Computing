@@ -25,9 +25,9 @@ for N in ${sizesn[@]}
   OMP_NUM_THREADS=1 ./ass2_main $method $N $d $kmax
 done
 
-#method=omp2
-#for N in ${sizesn[@]}
-# do
-#  ./ass2_main $method $N $d $kmax
-#done
+method=omp2
+for N in ${sizesn[@]}
+ do
+  ./ass2_main $method $N $d $kmax
+done
 

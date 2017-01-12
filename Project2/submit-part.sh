@@ -19,8 +19,8 @@ for t in ${sizest[@]}
   OMP_NUM_THREADS=$t ./ass2_main $method $N $d $kmax
 done
 
-#method=omp2
-#for t in ${sizest[@]}
-# do
-#  OMP_NUM_THREADS=$t ./ass2_main $method $N $d $kmax
-#done
+method=omp2
+for t in ${sizest[@]}
+ do
+  OMP_NUM_THREADS=$t ./ass2_main $method $N $d $kmax
+done

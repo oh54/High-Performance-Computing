@@ -258,7 +258,7 @@ int main(int argc, char **argv){
 			} // end parallel
 		double omp_time = omp_get_wtime() - omp_s;
 		int thread = omp_get_max_threads();
-		printf("%s, ", "OMP");
+		printf("%s, ", "OMP2");
 		printf("%f, ", omp_time);
 		printf("%i, %.20f, %i, %i\n", N, dd, k, thread);
 
