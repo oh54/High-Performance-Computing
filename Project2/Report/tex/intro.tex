@@ -1,8 +1,8 @@
-The goal of this assignment is to implement sequential versions of two iterative ODE solvers, namely the Jacobi method and the Gauss-Seidel method. The Jacobi method is parallelized using openMP and the scalability is compared to the parallelization of the calculation of the Mandelbrot set. Finally a method for parallelizing the Gauss.Seidel method is discussed but not implemented.
+The assignment seeks to solve the Poisson equation in two dimensions and the specific stated steady state heat problem of the heat distribution in a square room with a known boundary conditions. Taking this information, the goal of this assignment is to implement sequential versions of two iterative PDE solvers, namely the Jacobi method and the Gauss-Seidel method, which are both multi grid smoothers, that can be used to find the solution to the Poisson problem. The Jacobi method is parallelized using openMP and the scalability is compared to the parallelization of the calculation of the Mandelbrot set. All of the mentioned implimentations are then analyzed for different parameters and we seek to determine the prospects and limitations of the different approaches. Finally a method for parallelizing the Gauss-Seidel method is discussed but not implemented.
 
 \subsection{Computing Specifications}
-Unless otherwise stated a lot of the specifications are fixed throughout the report. The code is written in C and compiled with the Sun Studio compiler. All the experiments are run on the hpcintro queue on a single node with one processors per node (ppn), which is specified in the submit.sh script. All the nodes on the cluster are identical, and the full specifications are given in talbe \ref{tab:spec}.
-\begin{table}
+Unless otherwise stated a lot of the specifications are fixed throughout the report. The code is written in C and compiled with the Sun Studio compiler. All the sequential experiments are run on the hpcintro queue on a single node with one processors per node (ppn), which is specified in the submit.sh script. The details of the parallel experiments will be specified on the go. All the nodes on the cluster are identical, and the full specifications are given in table \ref{tab:spec}.
+\begin{table}[h!]
 \centering
 \begin{tabular}{l l}
 Architecture:     &     x86\_64 \\ \hline
