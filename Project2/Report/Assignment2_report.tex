@@ -24,5 +24,5 @@
 
 
 \section{Conclusion}
-
+In this report, a sequential implementation of the Jacobi iterative method and the Gauss-Seidel iterative method was implemented to solve Poisson's differential equation. The Gauss-Seidel method was found to converge twice as few iterations as the Jacobi method, but in turn the grid point updates per second was slower, but in total, the Gauss-Seidel method was found to be quicker in wall clock time. The Jacobi function can be easily parallelized, so three different versions with increasing amount of parallelization was created. The first only parallelized the loop updating each point, which gave a speedup of maximum 15 \%. Secondly, the checking and the iterative while loop was parallelized, which increased the speedup to a factor of $\sim 4$. Finally, the memory allocation and initialization was parallellized, bringing the top speedup to a factor of 10, which corresponds nicely to $f = 0.955$ in Amdahl's law, suggesting that our code has parallelized over 95 \% of the processes. Using this last implementation, it was found that the optimal number of cores used depends on the matrix size due to increasing parallel overhead from an increasing number of cores. Finally, a method for parallelizing the Gauss-Seidel method is discussed, but not implemented.
 \end{document}
