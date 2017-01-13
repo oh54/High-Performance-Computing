@@ -1,0 +1,6 @@
+<event kind="cwarn" id="227">WARNING: Target `mandelbrot' is not instrumented for datarace detection;
+	reported datarace data may be misleading
+</event>
+<powerm>
+<frequency clk="2300" frequency_scaling="enabled" turbo_mode="enabled"/>
+</powerm>
