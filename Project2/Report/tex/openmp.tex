@@ -25,11 +25,7 @@ We now end up with a much higher parallel fraction f of 0.93, again from the ana
 \label{fig:omp2_scale}
 \end{figure}
 
-As a final step, we seek to optimize the program even more by implementing a parallization of the memory allocation and initialization of the matrices. This is only relevant when the number of processors is exceeding 10. This is implemented by adding an if-clause around the memory allocation, and the memory initialization is always done in parallel. We call this version \texttt{omp3}. The can be seen in figure \ref{fig:omp3_scale}. Now the f actually becomes as high as 0.955. This also impact the speed up scaling and the parallel program is just more effective in general with the parallel memory allocation and it keeps up with Amdahl's law for the first 18 processors. It looks like it begins to stabilize around 18 threads, but it is hard to conclude that, since the speed up is just slightly below the benchmark. But more importantly, the increase in speedup continues above 10 processors, which was not the case with \texttt{omp2}. The speedup now reaches a factor of 10, which fits excellently with $f = 0.995$ for Amdahl's law.
-
-\begin{huge}
-DESCRIBE HOW
-\end{huge}
+As a final step, we seek to optimize the program even more by implementing a parallization of the memory allocation and initialization of the matrices to facilitate the first touch. This is only relevant when the number of processors is exceeding 10 because then processors 10 and above will access data from the other socket. This is implemented by adding an if-clause around the memory allocation, and the memory initialization is always done in parallel. We call this version \texttt{omp3}. The can be seen in figure \ref{fig:omp3_scale}. Now the f actually becomes as high as 0.955. This also impact the speed up scaling and the parallel program is just more effective in general with the parallel memory allocation and it keeps up with Amdahl's law for the first 18 processors. It looks like it begins to stabilize around 18 threads, but it is hard to conclude that, since the speed up is just slightly below the benchmark. But more importantly, the increase in speedup continues above 10 processors, which was not the case with \texttt{omp2}. The speedup now reaches a factor of 10, which fits excellently with $f = 0.995$ for Amdahl's law, meaning that we have parallelized over 95 \% of the processes.
 
 \begin{figure}[h!]
 \centering
