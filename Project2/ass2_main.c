@@ -138,7 +138,16 @@ int main(int argc, char **argv){
 	int k = 0;
 
 	double ** u, ** uo, ** f;
-	if (strcmp(argv[1], "omp3") == 0){
+	int i1 = 0;
+	#pragma omp parallel
+	{
+		int nthread = omp_get_num_threads();
+		#pragma omp master
+		{
+			if(nthread > 10) i1 = 1;;
+		}
+	}
+	if (strcmp(argv[1], "omp3") == 0 && i1 == 1){
 		u = dmalloc_2d_opt(N,N);
 		uo = dmalloc_2d_opt(N,N);
 		f = dmalloc_2d_opt(N,N);
