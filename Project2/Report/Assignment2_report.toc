@@ -1,0 +1,12 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{1}
+\contentsline {subsection}{\numberline {1.1}Computing Specifications}{1}
+\contentsline {section}{\numberline {2}Assignment}{2}
+\contentsline {subsection}{\numberline {2.1}Comparing convergence}{3}
+\contentsline {subsection}{\numberline {2.2}Comparing performance}{4}
+\contentsline {subsection}{\numberline {2.3}OpenMP of the Jacobi Method}{5}
+\contentsline {subsection}{\numberline {2.4}Speedup with varying matrix size}{7}
+\contentsline {subsection}{\numberline {2.5}Speedup with different compiler option}{9}
+\contentsline {subsection}{\numberline {2.6}Comparison with Mandelbrot program}{9}
+\contentsline {section}{\numberline {3}OpenMP Gauss-Seidel}{11}
+\contentsline {section}{\numberline {4}Conclusion}{11}
