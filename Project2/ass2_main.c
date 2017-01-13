@@ -269,18 +269,13 @@ int main(int argc, char **argv){
 			#pragma omp parallel default(none) shared	(u,uo,f,N,delta2, checksum, k, d, kmax) private(i,j)
 				{
 			while(checksum > d && k < kmax){
-					
 					jacobi_seq(u,uo,f,N,delta2);
-					
-					// checksum = fnorm_squared(u,uo,N);
 					#pragma omp for	private(i,j)  reduction(+:checksum)
 					for(i = 1; i <N-1; i++){
 						for(j = 1; j<N-1; j++){
 							checksum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
 						}
 					}
-					
-					
 					#pragma omp for	private(i,j) 
 					for(i = 0; i<N; i++){
 						for(j = 0; j<N; j++){
