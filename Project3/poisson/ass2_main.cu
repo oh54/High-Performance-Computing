@@ -7,49 +7,12 @@
 #include "ass2_lib.h"
 #include <omp.h>
 
-double ** dmalloc_2d(int m, int n) {
-	if (m <= 0 || n <= 0) return NULL;
-	double **A = (double **)malloc(m * sizeof(double *));
-	if (A == NULL) return NULL;
-	A[0] = (double *)malloc(m*n*sizeof(double));
-	if (A[0] == NULL) {
-		free(A); 
-		return NULL; 
-	}
-	int i;
-	for (i = 1; i < m; i++)
-		A[i] = A[0] + i * n;
-	return A;
-}
 
-
-double ** dmalloc_2d_opt(int m, int n) {
-	if (m <= 0 || n <= 0) return NULL;
-	double **A = (double **)malloc(m * sizeof(double *));
-	if (A == NULL) return NULL;
-	//A[0] = (double *)malloc(m*n*sizeof(double));	
-	#pragma omp parallel default(none) shared (A, m, n)
-	{
-		int i;
-		#pragma omp for	private(i) 
-		for (i = 0; i < m; i++)
-			A[i] = (double *)malloc(n*sizeof(double));
-	}
-	return A;
-}
-
-
-
-void dfree_2d(double **A) {
-	free(A[0]);
-	free(A);
-}
-
-void printMat(double ** A, int N){
+void printMat(double * A, int N){
 	int i,j;
 	for(i = 0; i < N; i++){
 		for(j = 0; j < N; j++){
-			printf("%7.0f ",A[i][j]);
+			printf("%7.0f ",A[i*N + j]);
 		}	
 		printf("\n");
 	}
@@ -58,7 +21,6 @@ void printMat(double ** A, int N){
 double fnorm_squared(double ** u, double ** uo, int N){
 	int i,j;
 	double sum = 0;
-	#pragma omp for	private(i,j)  reduction(+:sum)
 	for(i = 1; i <N-1; i++){
 		for(j = 1; j<N-1; j++){
 			sum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
@@ -67,52 +29,45 @@ double fnorm_squared(double ** u, double ** uo, int N){
 	return sum / (N*N);
 }
 
-void initialize_matrices(double ** u, double ** uo, double ** f, int N, double Nt){
+void initialize_matrices(double * u, double * uo, double * f, int N, double Nt){
 
 	
 	// init loop variables
 	int i, j;
 
-		double invN = 100.0/N;
 	// define uo as zeros\
 	uo[x][0] = 0 i.e. outer wall
-	#pragma omp for private (i, j)
 	for(i = 1; i < N; i++){
 		for(j = 1; j < N-1; j++){
-			uo[i][j] = i*invN;
-			// uo[i][j] = 0;
+			uo[i*N + j] = 0;
 		}
 	}
 	
 	// Defining the boundaries to 20
-	#pragma omp master
 	{
-		for(j = 0; j < N; j++) uo[0][j] = 20;
-		for(i = 0; i < N; i++) uo[i][0] = 20;
-		for(i = 0; i < N; i++) uo[i][N-1] = 20;
+		for(j = 0; j < N; j++) uo[j] = 20;
+		for(i = 0; i < N; i++) uo[i*N] = 20;
+		for(i = 0; i < N; i++) uo[i*N + N-1] = 20;
 	}
-	#pragma omp barrier
 		
 	//setting u = uo;
-	#pragma omp for private (i, j)
 	for(i = 0; i<N; i++){
 		for(j = 0; j<N; j++){
-			u[i][j] = uo[i][j];
+			u[i*N + j] = uo[i*N + j];
 		}
 	}
 	//printMat(uo,N);
 
 	// defining the f matrix
-	#pragma omp for private (i, j)
 	for(i = 0; i < N; i++){
 		for(j = 0; j < N; j++){
-			f[i][j] = 0;
+			f[i*N + j] = 0;
 		}
 	}
 
 	for(i = 4*Nt; i < 5*Nt; i++){
 		for(j = 3*Nt; j < 4*Nt; j++){
-			f[i][j] = 200;
+			f[i*N + j] = 200;
 		}
 	}
 }
@@ -140,27 +95,21 @@ int main(int argc, char **argv){
 	double checksum = 1000;
 	int k = 0;
 
-	double ** u, ** uo, ** f;
+	double * u, * uo, * f;
 	int i1 = 0;
-	#pragma omp parallel
-	{
-		int nthread = omp_get_num_threads();
-		#pragma omp master
-		{
-			if(nthread > 10) i1 = 1;;
-		}
-	}
-	if (strcmp(argv[1], "omp3") == 0 && i1 == 1){
-		u = dmalloc_2d_opt(N,N);
-		uo = dmalloc_2d_opt(N,N);
-		f = dmalloc_2d_opt(N,N);
-	} 
-	else {
-		u = dmalloc_2d(N,N);
-		uo = dmalloc_2d(N,N);
-		f = dmalloc_2d(N,N);
-	}
 
+	u = (double*)malloc(N*N*sizeof(double));
+	uo = (double*)malloc(N*N*sizeof(double));
+	f = (double*)malloc(N*N*sizeof(double));
+
+	initialize_matrices(u,uo,f, N,Nt);
+	printMat(u,N);
+	printf("\n");
+	printMat(uo,N);
+	printf("\n");
+	printMat(f,N);
+}
+/*
 	//initialize_matrices(u, uo, f, N, Nt);
 	int i, j;
 	struct timeval  tv1, tv2;
@@ -361,7 +310,8 @@ int main(int argc, char **argv){
 
 	//printf("k is: %i \n",k);
 
-	dfree_2d(u);
-	dfree_2d(uo);
-	dfree_2d(f);
-}
+//	dfree_2d(u);
+//	dfree_2d(uo);
+//	dfree_2d(f);
+//}
+
