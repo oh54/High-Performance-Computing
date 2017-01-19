@@ -126,11 +126,9 @@ void doSeq(double * u, double * uo, double * f, int N, double d, int kmax, doubl
 	double checksum = 1000.0;
 	while(k < kmax){
 		jacobi_seq_kernel<<<1, 1>>>(d_u, d_uo, d_f, N, delta2);
-	
 		double * temp = d_uo;
     		d_uo = d_u;
     		d_u = temp;
-
 		k++;
 	}
 
@@ -159,20 +157,17 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	int gridx = ceil((N-2)*1.0/(K));
 	int gridy = ceil((N-2)*1.0/(K));
 	
-	while(k < kmax && checksum > d ){
+	while(k < kmax){
 		jacobi_single_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d_u, d_uo, d_f, N, delta2);
-		cudaMemcpy(u, d_u, memsize, cudaMemcpyDeviceToHost);
-
-		checksum = fnorm_squared(u, uo, N);
-
-		update_uo(u, uo, N);
-		cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+		double * temp = d_uo;
+    		d_uo = d_u;
+    		d_u = temp;
 		k++;
 	}
-
+	cudaMemcpy(uo, d_uo, memsize, cudaMemcpyDeviceToHost);
 	printf("%s, ", "CU-SIN");
 	printf("%f, ", omp_get_wtime()-start);
-	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(u, N));
+	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(uo, N));
 }
 
 
@@ -209,17 +204,17 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	int gridy = ceil((N-2)*1.0/(K));
 	gridy = gridy / 2;
 	
-	while(k < kmax && checksum > d ){
+	while(k < kmax){
 
 		cudaSetDevice(0);
 		cudaMemcpy(u, d0_u, memsize/2, cudaMemcpyDeviceToHost);
 
-		jacobi_multi_kernel0<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
+		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
 		
 		checkCudaErrors(cudaDeviceSynchronize());
 		
 		cudaSetDevice(1);
-		jacobi_multi_kernel0<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
+		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
 		checkCudaErrors(cudaDeviceSynchronize());
 
 		cudaSetDevice(0);
@@ -229,7 +224,7 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 		cudaMemcpy(&u[memsize/2/sizeof(double)], &d1_u[N], memsize/2, cudaMemcpyDeviceToHost);
 
 
-		checksum = fnorm_squared(u, uo, N);
+		//checksum = fnorm_squared(u, uo, N);
 
 		update_uo(u, uo, N);
 

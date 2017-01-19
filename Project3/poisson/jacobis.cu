@@ -17,7 +17,7 @@ void jacobi_single_kernel(double * d_u, double * d_uo, double * d_f, int N, doub
 }
 
 __global__ 
-void jacobi_multi_kernel0(double * d0_u, double * d0_uo, double * d0_f, int N, double delta2){
+void jacobi_multi_kernel(double * d0_u, double * d0_uo, double * d0_f, int N, double delta2){
 	int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
 	int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
 	
