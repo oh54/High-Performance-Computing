@@ -2,7 +2,7 @@ TARGET	= libmatmult.so
 LIBSRCS	= 
 LIBOBJS	= ass1_lib.o
 
-OPT	= -g
+OPT	= -O3 #-g
 PIC = -fpic
 XPIC  = -Xcompiler -fpic
 XOPTS = -G -Xptxas=-v

@@ -3,6 +3,7 @@
 #include <math.h>
 #include <algorithm>
 #include "helper_cuda.h"
+#include "cublas_v2.h"
 extern "C" {
 #include "cblas.h"
 //}
@@ -53,12 +54,12 @@ void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){
 	int gridx = ceil(n*1.0/K);
 	int gridy = ceil(m*1.0/K);
 	double *d_A, *d_B, *d_C;
-	cudaMalloc(&d_A,n*m*sizeof(double));
-	cudaMalloc(&d_B,k*m*sizeof(double));
-	cudaMalloc(&d_C,n*k*sizeof(double));
+	cudaMalloc(&d_A,k*m*sizeof(double));
+	cudaMalloc(&d_B,k*n*sizeof(double));
+	cudaMalloc(&d_C,n*m*sizeof(double));
 
- 	cudaMemcpy(d_A,A,n*m*sizeof(double), cudaMemcpyHostToDevice);
- 	cudaMemcpy(d_B,B,k*m*sizeof(double), cudaMemcpyHostToDevice);
+ 	cudaMemcpy(d_A,A,k*m*sizeof(double), cudaMemcpyHostToDevice);
+ 	cudaMemcpy(d_B,B,k*n*sizeof(double), cudaMemcpyHostToDevice);
 	cudaPar<<<dim3(gridx,gridy),dim3(K,K)>>>(m,n,k,d_A,d_B,d_C);
 	cudaMemcpy(C,d_C,n*m*sizeof(double), cudaMemcpyDeviceToHost);
 /*	#ifndef __print
@@ -76,9 +77,9 @@ void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){
 __host__
 void matmult_gpu3(int m, int n, int k, double * A, double * B, double * C){
 	int K = 16;
-	int gridx = ceil(n*1.0/K);
-	int gridy = ceil(m*1.0/K*0.5);
 	int p = 2;
+	int gridx = ceil(n*1.0/K);
+	int gridy = ceil(m*1.0/K/p);
 	double *d_A, *d_B, *d_C;
 
 	checkCudaErrors(cudaMalloc(&d_A,k*m*sizeof(double)));
@@ -95,6 +96,86 @@ void matmult_gpu3(int m, int n, int k, double * A, double * B, double * C){
 	cudaFree(d_A);
 	cudaFree(d_B);
 	cudaFree(d_C);
+}
+
+
+void matmult_gpu4(int m, int n, int k, double * A, double * B, double * C){
+	int K = 16;
+	int p = 4;
+	int gridx = ceil(n*1.0/K);
+	int gridy = ceil(m*1.0/K/p);
+	double *d_A, *d_B, *d_C;
+
+	checkCudaErrors(cudaMalloc(&d_A,k*m*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_B,n*k*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_C,n*m*sizeof(double)));
+
+ 	checkCudaErrors(cudaMemcpy(d_A,A,k*m*sizeof(double), cudaMemcpyHostToDevice));
+ 	checkCudaErrors(cudaMemcpy(d_B,B,k*n*sizeof(double), cudaMemcpyHostToDevice));
+	cudaPar4<<<dim3(gridx,gridy),dim3(K,K)>>>(m,n,k,p,d_A,d_B,d_C);
+//	checkCudaErrors(cudaDeviceSynchronize());
+	cudaMemcpy(C,d_C,n*m*sizeof(double), cudaMemcpyDeviceToHost);
+//	printMat(C,m,n);
+
+	cudaFree(d_A);
+	cudaFree(d_B);
+	cudaFree(d_C);
+}
+
+
+void matmult_gpu5(int m, int n, int k, double * A, double * B, double * C){
+	
+//	cudaSetDevice(4);
+	int K = 32;
+	int gridx = floor(n*1.0/K);
+	int gridy = floor(m*1.0/K);
+	double *d_A, *d_B, *d_C;
+
+	checkCudaErrors(cudaMalloc(&d_A,k*m*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_B,n*k*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_C,n*m*sizeof(double)));
+
+ 	checkCudaErrors(cudaMemcpy(d_A,A,k*m*sizeof(double), cudaMemcpyHostToDevice));
+ 	checkCudaErrors(cudaMemcpy(d_B,B,k*n*sizeof(double), cudaMemcpyHostToDevice));
+	cudaSMEM<<<dim3(gridx,gridy),dim3(K,K)>>>(m,n,k,d_A,d_B,d_C);
+	cudaDeviceSynchronize();
+//	checkCudaErrors(cudaDeviceSynchronize());
+	cudaMemcpy(C,d_C,n*m*sizeof(double), cudaMemcpyDeviceToHost);
+	//printMat(C,m,n);
+	// printf("\n");
+
+	cudaFree(d_A);
+	cudaFree(d_B);
+	cudaFree(d_C);
+}
+
+void matmult_gpulib(int m, int n, int k, double * A, double * B, double * C){
+	double alpha = 1.0;
+	double beta = 0.0;
+	const double *alphap, *betap;
+	alphap = &alpha;
+	betap = &beta;
+
+	double *d_A, *d_B, *d_C;
+
+	checkCudaErrors(cudaMalloc(&d_A,k*m*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_B,n*k*sizeof(double)));
+	checkCudaErrors(cudaMalloc(&d_C,n*m*sizeof(double)));
+
+ 	checkCudaErrors(cudaMemcpy(d_A,A,k*m*sizeof(double), cudaMemcpyHostToDevice));
+ 	checkCudaErrors(cudaMemcpy(d_B,B,k*n*sizeof(double), cudaMemcpyHostToDevice));
+
+	cublasHandle_t handle;
+	cublasCreate(&handle);
+//	cublasDGEMM(cublasHandle_t handle, CUBLAS_OP_N, CUBLAS_OP_N,                         m, n, k,                           alpha,                           A, int lda,                           B, int ldb,                           beta,                           C, int ldc)
+
+cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, alphap, d_B, n, d_A, k, betap, d_C, n);
+
+cublasDestroy(handle);
+cudaMemcpy(C,d_C,m*n*sizeof(double),cudaMemcpyDeviceToHost);
+cudaFree(d_A);
+cudaFree(d_B);
+cudaFree(d_C);
 }
 
 
@@ -138,7 +219,7 @@ void cudaPar2(int m, int n, int k, int p, double * A, double * B, double * C){
 	const int P = 2;
 	double C_r[P]={0.0,0.0};
 
-	int q = m%p;
+//	int q = m%p;
 	int i = blockIdx.x*blockDim.x + threadIdx.x;
 	int j = blockIdx.y*blockDim.y + threadIdx.y;
 //	printf("before if\n");
@@ -169,8 +250,65 @@ void cudaPar2(int m, int n, int k, int p, double * A, double * B, double * C){
 }
 
 
+__global__
+void cudaPar4(int m, int n, int k, int p, double * A, double * B, double * C){
+	const int P = 4;
+	double C_r[P]={0.0,0.0};
+
+//	int q = m%p;
+	int i = blockIdx.x*blockDim.x + threadIdx.x;
+	int j = blockIdx.y*blockDim.y + threadIdx.y;
+
+	j = j*p; // allows C[i + (0/1) j*n] indexing
+	if(i < n && j < m-p + 1){
+		for(int pp = 0; pp < p; pp++){
+			for(int l = 0; l < k; l++){
+				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
+			}
+			C[(j + pp)*n + i] =  C_r[pp];
+		}
+	}
+
+	if(i < n && j > m-p && j < m){
+		for(int pp = 0; pp < p; pp++){
+			for(int l = 0; l < k; l++){
+				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
+			}
+			C[(j + pp)*n + i] =  C_r[pp];
+		}
+	}
+
+}
+
+__global__
+void cudaSMEM(int m, int n, int k, double * A, double * B, double * C){
+	
+	const int K = 32;	
+	int kk = k/K;
+
+	int i = blockIdx.x*blockDim.x + threadIdx.x;
+	int j = blockIdx.y*blockDim.y + threadIdx.y;
+	int iBlock = threadIdx.x;
+	int jBlock = threadIdx.y;
 
 
+	__shared__ double smemA[K][K];
+	__shared__ double smemB[K][K];
+	__shared__ double smemC[K][K];
+
+	smemC[jBlock][iBlock] = 0;
+
+	for(int q = 0; q < kk; q++){
+		smemB[jBlock][iBlock] = B[i + q*K*n + jBlock*n];
+		smemA[jBlock][iBlock] = A[iBlock + j*k + q*K];
+		__syncthreads();
+		for(int z = 0; z < K; z++){
+			smemC[jBlock][iBlock] += smemA[jBlock][z]*smemB[z][iBlock];
+		}
+		__syncthreads();
+	}
+	C[i + j*n] = smemC[jBlock][iBlock];
+}
 
 
 
@@ -332,6 +470,7 @@ void matmult_nmk(int m, int n, int k, double ** A, double ** B, double ** C){
 	}
 }
 
+__host__ __device__
 void printMat(double *A, int m, int n){
 	for(int i = 0; i < m;i++){
 		for(int j = 0; j < n;j++){
