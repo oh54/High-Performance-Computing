@@ -1,6 +1,6 @@
 TARGET	 = poisson
 SRCS	 = 
-OBJS	 = ass2_main.o jacobis.o
+OBJS	 = ass2_main.o jacobis.o uo_updates.o
 
 OPT      = -g
 PIC 	 =
@@ -30,3 +30,4 @@ clean:
 
 ass2_main.o : ass2_main.cu ass2_lib.h
 jacobis.o : jacobis.cu
+uo_updates.o : uo_updates.cu

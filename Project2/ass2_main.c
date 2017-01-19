@@ -338,14 +338,16 @@ int main(int argc, char **argv){
 					#pragma omp barrier
 				} // end while 
 			} // end parallel
-	double omp_time = omp_get_wtime() - omp_s;
 
-	checksum = getMatSum(u, N);
-	
 	int thread = omp_get_max_threads();
+
+	//printf("MATRIX U:\n");
+	//printMat(u,N);
+	//printf("\n");
+
 	printf("%s, ", "OMP3");
-	printf("%f, ", omp_time);
-	printf("%i, %.20f, %.0f, %i\n", N, dd, checksum, thread);
+	printf("%f, ", omp_get_wtime() - omp_s);
+	printf("%i, %.20f, %.0f, %i, %i\n", N, dd, getMatSum(u, N), thread, k);
 
 	}
 
