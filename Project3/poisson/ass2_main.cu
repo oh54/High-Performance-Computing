@@ -6,6 +6,7 @@
 #include <string.h>
 #include "ass2_lib.h"
 #include <omp.h>
+#include "helper_cuda.h"
 
 
 void printMat(double * A, int N){
@@ -18,16 +19,26 @@ void printMat(double * A, int N){
 	}
 }
 
-double fnorm_squared(double ** u, double ** uo, int N){
+double fnorm_squared(double * u, double * uo, int N){
 	int i,j;
 	double sum = 0;
 	for(i = 1; i <N-1; i++){
 		for(j = 1; j<N-1; j++){
-			sum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
+			sum += (u[i*N + j]-uo[i*N + j])*(u[i*N + j]-uo[i*N + j]);
 		}
 	}
 	return sum / (N*N);
 }
+
+void update_uo(double * u, double * uo, int N){
+	int i,j;
+	for(i = 0; i<N; i++){
+		for(j = 0; j<N; j++){
+			uo[i*N + j] = u[i*N + j];
+		}
+	}
+}
+
 
 void initialize_matrices(double * u, double * uo, double * f, int N, double Nt){
 
@@ -72,43 +83,204 @@ void initialize_matrices(double * u, double * uo, double * f, int N, double Nt){
 	}
 }
 
+
+__host__
+void doSeq(double * u, double * uo, double * f, int N, double d, int kmax, double delta2, double dd){
+	double start = omp_get_wtime(); 
+	double *d_u, *d_uo, *d_f;
+	int memsize = N*N*sizeof(double);
+	cudaMalloc(&d_u, memsize);
+	cudaMalloc(&d_uo, memsize);
+	cudaMalloc(&d_f, memsize);	
+	cudaMemcpy(d_u, u, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_f, f, memsize, cudaMemcpyHostToDevice);
+	int k = 0;
+	double checksum = 1000.0;
+	while(k < kmax && checksum > d ){
+		jacobi_seq_kernel<<<1, 1>>>(d_u, d_uo, d_f, N, delta2);
+
+		cudaMemcpy(u, d_u, memsize, cudaMemcpyDeviceToHost);
+		
+		checksum = fnorm_squared(u, uo, N);
+
+		update_uo(u, uo, N);
+		cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+		k++;
+	}
+	printf("%s, ", "CU-SEQ");
+	printf("%f, ", omp_get_wtime()-start);
+	printf("%i, %.20f, %i\n", N, dd, k);
+}
+
+
+__host__
+void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, double delta2, double dd){
+	double start = omp_get_wtime(); 
+	double *d_u, *d_uo, *d_f;
+	int memsize = N*N*sizeof(double);
+	cudaMalloc(&d_u, memsize);
+	cudaMalloc(&d_uo, memsize);
+	cudaMalloc(&d_f, memsize);	
+	cudaMemcpy(d_u, u, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_f, f, memsize, cudaMemcpyHostToDevice);
+	int k = 0;
+	double checksum = 1000.0;
+			
+	int K = 8;
+	int gridx = ceil((N-2)*1.0/(K));
+	int gridy = ceil((N-2)*1.0/(K));
+	
+	while(k < kmax && checksum > d ){
+		jacobi_single_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d_u, d_uo, d_f, N, delta2);
+		cudaMemcpy(u, d_u, memsize, cudaMemcpyDeviceToHost);
+
+		checksum = fnorm_squared(u, uo, N);
+
+		update_uo(u, uo, N);
+		cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+		k++;
+	}
+	printf("%s, ", "CU-SIN");
+	printf("%f, ", omp_get_wtime()-start);
+	printf("%i, %.20f, %i\n", N, dd, k);
+}
+
+
+__host__
+void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, double delta2, double dd){
+	double start = omp_get_wtime(); 
+	double *d0_u, *d0_uo, *d0_f, *d1_u, *d1_uo, *d1_f;
+	int memsize = N*N*sizeof(double);
+
+	cudaSetDevice(0);
+	cudaMalloc(&d0_u, memsize/2 + N);
+	cudaMalloc(&d0_uo, memsize/2 + N);
+	cudaMalloc(&d0_f, memsize/2 + N);
+	cudaMemcpy(d0_u, u, memsize/2 + N, cudaMemcpyHostToDevice);
+	cudaMemcpy(d0_uo, uo, memsize/2 + N, cudaMemcpyHostToDevice);
+	cudaMemcpy(d0_f, f, memsize/2 + N, cudaMemcpyHostToDevice);
+	//cudaDeviceEnablePeerAccess (1, 0);
+
+	cudaSetDevice(1); 
+	cudaMalloc(&d1_u, memsize/2 + N);
+	cudaMalloc(&d1_uo, memsize/2 + N);
+	cudaMalloc(&d1_f, memsize/2 + N);
+	cudaMemcpy(d1_u, u + memsize/2 - N, memsize/2 + 2*N, cudaMemcpyHostToDevice);
+	cudaMemcpy(d1_uo, uo + memsize/2 - N, memsize/2 + 2*N, cudaMemcpyHostToDevice);
+	cudaMemcpy(d1_f, f + memsize/2 - N, memsize/2 + 2*N, cudaMemcpyHostToDevice);
+	//cudaDeviceEnablePeerAccess (0, 0);
+
+	int k = 0;
+	double checksum = 1000.0;
+			
+	int K = 8;
+	int gridx = ceil((N-2)*1.0/(K));
+	int gridy = ceil((N-2)*1.0/(K));
+	gridx = gridx / 2;
+	
+	while(k < kmax && checksum > d ){
+		cudaSetDevice(0);
+		jacobi_multi_kernel0<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
+		//checkCudaErrors(cudaDeviceSynchronize());
+		cudaSetDevice(1);
+		jacobi_multi_kernel1<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
+
+		cudaSetDevice(0);
+		cudaMemcpy(u, d0_u, memsize/2, cudaMemcpyDeviceToHost);
+		checkCudaErrors(cudaDeviceSynchronize());
+		cudaSetDevice(1);
+		cudaMemcpy(u + memsize/2, d1_u, memsize/2, cudaMemcpyDeviceToHost);
+		
+		checksum = fnorm_squared(u, uo, N);
+
+		update_uo(u, uo, N);
+		cudaSetDevice(0);
+		cudaMemcpy(d0_uo, uo, memsize/2 + N, cudaMemcpyHostToDevice);
+		cudaSetDevice(1);
+		cudaMemcpy(d1_uo, uo + memsize/2 - N, memsize/2 + 2*N, cudaMemcpyHostToDevice);
+		k++;
+	}
+	printf("%s, ", "CU-MUL");
+	printf("%f, ", omp_get_wtime()-start);
+	printf("%i, %.20f, %i\n", N, dd, k);
+}
+
+
+
+
+
 int main(int argc, char **argv){
-	// ./ass2_main <method type> <NN> <d> <kmax>
+	// ./poisson <method type> <NN> <d> <kmax>
 	
 	int NN;
 	double dd;
 	int kmax;
-	
 	
 	sscanf(argv[2] , "%d", &NN);
 	sscanf(argv[3] , "%lf", &dd);
 	sscanf(argv[4] , "%d", &kmax);
 
 	double d = dd*dd;
-	// Size of square NUMERICAL domain
 	int N = NN + 2;
-	double delta = 2.0/N; // distance between points
-	double delta2 = delta*delta; // delta squared
-	double delta2inv = 1/delta2; // 1/delta2
-	double Nt = N/6.0; // number of points corresponding to a third in physical units	
-
-	double checksum = 1000;
-	int k = 0;
+	double delta = 2.0/N;
+	double delta2 = delta*delta; 
+	double Nt = N/6.0; 	
 
 	double * u, * uo, * f;
-	int i1 = 0;
 
 	u = (double*)malloc(N*N*sizeof(double));
 	uo = (double*)malloc(N*N*sizeof(double));
 	f = (double*)malloc(N*N*sizeof(double));
 
 	initialize_matrices(u,uo,f, N,Nt);
-	printMat(u,N);
-	printf("\n");
-	printMat(uo,N);
-	printf("\n");
-	printMat(f,N);
+	//printf("MATRIX U:\n");
+	//printMat(u,N);
+	//printf("\n");
+	//printf("MATRIX UO:\n");
+	//printMat(uo,N);
+	//printf("\n");
+
+	if(strcmp(argv[1], "seq") == 0){
+		doSeq(u, uo, f, N, d, kmax, delta2, dd); 
+	}
+
+	
+	// naive single GPU
+	// NN must be multiple of K
+	if(strcmp(argv[1], "sin") == 0){
+		doSingle(u, uo, f, N, d, kmax, delta2, dd);
+
+	}
+	
+	
+	// naive multi GPU
+	// NN must be even multiple of K
+	if(strcmp(argv[1], "mul") == 0){
+		doMulti(u, uo, f, N, d, kmax, delta2, dd);
+
+
+
+	}
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// WEEK2 OPENMP STUFF
 /*
 	//initialize_matrices(u, uo, f, N, Nt);
 	int i, j;

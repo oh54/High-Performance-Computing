@@ -1,6 +1,6 @@
 TARGET	 = poisson
 SRCS	 = 
-OBJS	 = ass2_main.o jacobi_seq.o gauss_seidel.cu
+OBJS	 = ass2_main.o jacobis.o
 
 OPT      = -g
 PIC 	 =
@@ -29,5 +29,4 @@ clean:
 
 
 ass2_main.o : ass2_main.cu ass2_lib.h
-jacobi_seq.o : jacobi_seq.cu
-gauss_seidel.o : gauss_seidel.cu
+jacobis.o : jacobis.cu
