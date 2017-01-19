@@ -55,6 +55,18 @@ void printMat(double ** A, int N){
 	}
 }
 
+double getMatSum(double ** A, int N){
+	int i,j;
+	double sum = 0;
+	for(i = 0; i < N; i++){
+		for(j = 0; j < N; j++){
+			sum += A[i][j];
+		}	
+	}
+	return sum;
+}
+
+
 double fnorm_squared(double ** u, double ** uo, int N){
 	int i,j;
 	double sum = 0;
@@ -310,15 +322,8 @@ int main(int argc, char **argv){
 		double omp_s = omp_get_wtime();
 			#pragma omp parallel default(none) shared	(u,uo,f,N,delta2, checksum, k, d, kmax) private(i,j)
 			{
-				while(checksum > d && k < kmax){
+				while(k < kmax){
 					jacobi_seq(u,uo,f,N,delta2);
-					// checksum = fnorm_squared(u,uo,N);
-					#pragma omp for	private(i,j)  reduction(+:checksum)
-					for(i = 1; i <N-1; i++){
-						for(j = 1; j<N-1; j++){
-							checksum += (u[i][j]-uo[i][j])*(u[i][j]-uo[i][j]);
-						}
-					}
 					#pragma omp for	private(i,j) 
 					for(i = 0; i<N; i++){
 						for(j = 0; j<N; j++){
@@ -334,10 +339,13 @@ int main(int argc, char **argv){
 				} // end while 
 			} // end parallel
 	double omp_time = omp_get_wtime() - omp_s;
+
+	checksum = getMatSum(u, N);
+	
 	int thread = omp_get_max_threads();
 	printf("%s, ", "OMP3");
 	printf("%f, ", omp_time);
-	printf("%i, %.20f, %i, %i\n", N, dd, k, thread);
+	printf("%i, %.20f, %.0f, %i\n", N, dd, checksum, thread);
 
 	}
 

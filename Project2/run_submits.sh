@@ -1,7 +1,7 @@
 #!/bin/sh
 module load studio
 make clean_all
-make CFLAGS='-g -fast -xopenmp'
+make CFLAGS='-fast -xopenmp'
 
 # sequential experiments, varying d and varying n
 #qsub submit-seqd.sh -o seqd_o.txt -e seqd_e.txt
