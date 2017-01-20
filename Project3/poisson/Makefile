@@ -4,7 +4,7 @@ OBJS	 = ass2_main.o jacobis.o uo_updates.o
 
 OPT      = -g
 PIC 	 =
-XOPTS	 = -G -Xptxas=-v
+XOPTS	 = -Xptxas=-v
 ARCH 	 = -arch=sm_30
 OMP  	 = -fopenmp
 

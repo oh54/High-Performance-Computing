@@ -144,7 +144,6 @@ void doSeq(double * u, double * uo, double * f, int N, double d, int kmax, doubl
 
 __host__
 void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, double delta2, double dd){
-	double start = omp_get_wtime(); 
 	double *d_u, *d_uo, *d_f;
 	int memsize = N*N*sizeof(double);
 	cudaMalloc(&d_u, memsize);
@@ -161,6 +160,7 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	int gridx = ceil((N-2)*1.0/(K));
 	int gridy = ceil((N-2)*1.0/(K));
 
+	double start = omp_get_wtime(); 
 	while(k < kmax){
 		jacobi_single_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d_u, d_uo, d_f, N, delta2);
 		double * temp = d_uo;
@@ -168,6 +168,7 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
     		d_u = temp;
 		k++;
 	}
+	double end = omp_get_wtime(); 
 	cudaMemcpy(uo, d_uo, memsize, cudaMemcpyDeviceToHost);
 
 	//printf("MATRIX UO:\n");
@@ -175,7 +176,7 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	//printf("\n");
 
 	printf("%s, ", "CU-SIN");
-	printf("%f, ", omp_get_wtime()-start);
+	printf("%f, ", end-start);
 	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(uo, N));
 	cudaFree(d_u);
 	cudaFree(d_uo);
@@ -187,13 +188,13 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 
 __host__
 void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, double delta2, double dd){
-	double start = omp_get_wtime(); 
+	
 	double *d0_u, *d0_uo, *d0_f, *d1_u, *d1_uo, *d1_f;
 	int memsize = N*N*sizeof(double);
 	int Nsize = N*sizeof(double);
 
-	cudaSetDevice(0);
-	cudaDeviceEnablePeerAccess(1,0);
+	cudaSetDevice(6);
+	cudaDeviceEnablePeerAccess(7,0);
 	cudaMalloc((void**)&d0_u, memsize/2 + Nsize);
 	cudaMalloc((void**)&d0_uo, memsize/2 + Nsize);
 	cudaMalloc((void**)&d0_f, memsize/2 + Nsize);
@@ -201,8 +202,8 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	cudaMemcpy(d0_uo, uo, memsize/2 + Nsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d0_f, f, memsize/2 + Nsize, cudaMemcpyHostToDevice);
 
-	cudaSetDevice(1); 
-	cudaDeviceEnablePeerAccess(0,0);
+	cudaSetDevice(7); 
+	cudaDeviceEnablePeerAccess(6,0);
 	cudaMalloc((void**)&d1_u, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_uo, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_f, memsize/2 + Nsize);
@@ -221,12 +222,12 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 
 	//printf("%i, %i\n", gridx, gridy);
 	//printf("NR THREADS: %i\n", 2*gridx * gridy * K * K);
-
+	double start = omp_get_wtime(); 
 	while(k < kmax){
-		cudaSetDevice(0);
-		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
-		cudaSetDevice(1);
-		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
+		cudaSetDevice(6);
+		jacobi_multi_kernel0<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
+		cudaSetDevice(7);
+		jacobi_multi_kernel1<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
 
 		cudaDeviceSynchronize();
 
@@ -246,9 +247,10 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 
 		k++;
 	}
-	cudaSetDevice(0);
+	double end = omp_get_wtime();
+	cudaSetDevice(6);
 	cudaMemcpy(uo, d0_uo, memsize/2, cudaMemcpyDeviceToHost);
-	cudaSetDevice(1);
+	cudaSetDevice(7);
 	cudaMemcpy(&uo[memsize/2/sizeof(double)], &d1_uo[N], memsize/2, cudaMemcpyDeviceToHost);
 	cudaDeviceSynchronize();
 
@@ -257,7 +259,7 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	//printf("\n");
 
 	printf("%s, ", "CU-MUL");
-	printf("%f, ", omp_get_wtime()-start);
+	printf("%f, ", end-start);
 	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(uo, N));
 	cudaFree(d1_u);
 	cudaFree(d1_uo);
