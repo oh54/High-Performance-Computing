@@ -1,0 +1,34 @@
+In this report we investigate the performance of GPU's on matrix matrix multiplication from project 1 and the Poisson-problem from project 2. The two tasks are compute bound and memory bound respectively, so they are a good basis for exploring the capabilities of GPU acceleration on different types of problems. All GPU kernels are executed on the cluster Tesla K40c with selected specifications listed in table \ref{tab:gpuspecs}
+
+\begin{table}
+\begin{tabular}{l|l}
+  CUDA Driver Version / Runtime Version        &  8.0 / 8.0\\ \hline
+  CUDA Capability Major/Minor version number:  &  3.5\\ \hline
+  Total amount of global memory:               &  11439 MBytes (11995054080 bytes)\\ \hline
+  (15) Multiprocessors, (192) CUDA Cores/MP:   &  2880 CUDA Cores\\ \hline
+  GPU Max Clock rate:                          &  745 MHz (0.75 GHz)\\ \hline
+  Memory Clock rate:                           &  3004 Mhz\\ \hline
+  Memory Bus Width:                            &  384-bit\\ \hline
+  L2 Cache Size:                               &  1572864 bytes\\ \hline
+  Total amount of constant memory:             &  65536 bytes\\ \hline
+  Total amount of shared memory per block:     &  49152 bytes\\ \hline
+  Total number of registers available per block:& 65536\\ \hline
+  Warp size:                                   &  32\\ \hline
+  Maximum number of threads per multiprocessor:&  2048\\ \hline
+  Maximum number of threads per block:         &  1024\\ \hline
+  Max dimension size of a thread block (x,y,z):& (1024, 1024, 64)\\ \hline
+  Max dimension size of a grid size    (x,y,z):& (2147483647, 65535, 65535)\\ \hline
+  Maximum memory pitch:                        &  2147483647 bytes\\ \hline
+  Texture alignment:                           &  512 bytes\\ \hline
+  Concurrent copy and kernel execution:        &  Yes with 2 copy engine(s)\\ \hline
+  Run time limit on kernels:                   &  No\\ \hline
+  Integrated GPU sharing Host Memory:          &  No\\ \hline
+  Support host page-locked memory mapping:     &  Yes\\ \hline
+  Alignment requirement for Surfaces:          &  Yes\\ \hline
+  Device has ECC support:                      &  Enabled\\ \hline
+  Device supports Unified Addressing (UVA):    &  Yes\\ \hline
+  Device PCI Domain ID / Bus ID / location ID: &  0 / 132 / 0\\ 
+\end{tabular}
+\caption{Selected specifications of the Tesla K40c GPU.}
+\label{tab:gpuspecs}
+\end{table}

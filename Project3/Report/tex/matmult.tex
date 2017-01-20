@@ -1,0 +1,82 @@
+\subsection{Matrix matrix multiplication problem}
+Matrix matrix multiplication was covered in project 1, and the operation requires $\sim N^3$ floating point operations performed on $\sim N^2$ elements, which means that the problem is compute bound for large matrices. This should be optimal for GPU execution due to the very high number of cores working in parallel. In the following, a GPU program is developed in CUDA 8.0, with incremental steps that would improve the performance.
+\subsubsection{GPU1}
+The first version is a sequential version only to be run on a single CUDA core. Peroformance wise, this is very uninteresting, but it is a good exercise to ensure that the framework of \texttt{cudaMalloc} and \texttt{cudaMemcpy} is set-up correctly. The code is shown below.
+
+\begin{lstlisting}[caption = gpu1 function with the cuda framework. The kernel \texttt{cudaSeq} is identical to the mkn permutaion from project 1.]
+__host__
+void matmult_gpu1(int m, int n, int k, double * A, double * B, double * C){
+
+	double *d_A, *d_B, *d_C;
+	cudaMalloc(&d_A,n*m*sizeof(double));
+	cudaMalloc(&d_B,k*m*sizeof(double));
+	cudaMalloc(&d_C,n*k*sizeof(double));
+
+ 	cudaMemcpy(d_A,A,n*m*sizeof(double), cudaMemcpyHostToDevice);
+ 	cudaMemcpy(d_B,B,k*m*sizeof(double), cudaMemcpyHostToDevice);
+	
+	cudaSeq<<<1,1>>>(m,n,k,d_A,d_B,d_C);
+	cudaMemcpy(C,d_C,n*m*sizeof(double), cudaMemcpyDeviceToHost);
+
+	cudaFree(d_A);
+	cudaFree(d_B);
+	cudaFree(d_C);
+}
+\end{lstlisting}
+The kernel is called with \texttt{<<<1,1>>>} which signifies one block consisting of one thread, and thus the entire operation is done in sequential mode. The kernel is identical to the \texttt{mkn} permutation of project 1, and is not shown here. The framework shown above is identical in all subsequent functions. The performance of \texttt{gpu1} is compared to the DGEMM cblas library function run on 4 threads in figure \ref{fig:gpu1_DGEMM}. \textbf{?? FIGURE EXPLAINED HERE}
+
+\begin{figure}
+\centering
+\includegraphics[width = 0.8\textwidth]{fig/placeholder.jpg}
+\caption{The \texttt{gpu1} function compared to the cblas DGEMM run on 4 cores.}
+\label{fig:gpu1_DGEMM}
+\end{figure}
+
+\subsubsection{GPU2}
+Obviously, using only 1 thread is not the way to use a GPU to increase performance, so in order to better utilize the many threads allowed on a GPU, we now implement a function, \texttt{gpu2}, that uses one thread per element of matrix $C$ is size $m\times n$. The threads are ordered in a 2D grid consisting of \texttt{16$\times$16} threads. The grid size is adapted to the matrix size such that the grid dimension are \texttt{gridx = ceil(n/16)} and \texttt{gridy = ceil(m/16)}. If the matrix size is not a multiple of the block size, excess threads are allocated and not used, but for large matrices, the number of unused threads is small compared to the total number of threads. For small matrices it is thus favorable to have a smaller grid size. The code is shown below.
+\begin{lstlisting}[caption = Code sample of the naive implementation with one thread per element in $C$.]
+__host__
+void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){	
+	int K = 32;
+	int gridx = ceil(n*1.0/K);
+	int gridy = ceil(m*1.0/K);
+	...
+	cudaPar<<<dim3(gridx,gridy),dim3(K,K)>>>(m,n,k,d_A,d_B,d_C);
+	...
+}
+
+__global__
+void cudaPar(int m, int n, int k, double * A, double * B, double * C){
+	int i = blockIdx.x*blockDim.x + threadIdx.x;
+	int j = blockIdx.y*blockDim.y + threadIdx.y;
+
+	if(i < n && j < m){
+		C[i + j*n] = 0;
+
+		for(int l = 0; l < k;l++){
+			C[j*n + i] += A[k*j + l]*B[l*n + i];
+		}
+	}
+}
+	
+\end{lstlisting}
+The if clause ensures that work is only done inside the matrix, such that none of the excess threads do any unwanted work that could cause a segmentation fault. The last for loop runs through the $k$ elements of A and B in row $j$ and column $i$, and saves the answer sum of the products in the correct element of $C$.
+
+The \texttt{gpu2} function is compared to the cblas DGEMM run on 4 cores for different matrix sizes in figure \ref{fig:gpu2_DGEMM}.\textbf{?? EXPLAIN FIGURE AND PROFILER RESULTS HERE}.
+
+\begin{figure}
+\centering
+\includegraphics[width = 0.8\textwidth]{fig/placeholder.jpg}
+\caption{Performance of the \texttt{gpu2} function and the cblas DGEMM for different matrix sizes.}
+\label{fig:gpu2_DGEMM}
+\end{figure}
+
+\subsubsection{GPU3}
+
+
+\subsubsection{GPU4}
+
+
+\subsubsection{GPU5}
+
+\subsubsection{GPULIB}
