@@ -75,7 +75,7 @@ void jacobi_single_kernel(double * d_u, double * d_uo, double * d_f, int N, doub
 }
 \end{lstlisting}
 
-Figure \ref{fig:poisson_seq} presents the point updates per second for \texttt{omp3} running on 14 threads and the naive GPU approach. It is apparent that the naive GPU approach already easily outperforms our best implementation from week2.  
+Figure \ref{fig:poisson_sin} presents the point updates per second for \texttt{omp3} running on 14 threads and the naive GPU approach. It is apparent that the naive GPU approach already easily outperforms our best implementation from week2.  
 
 
 \begin{figure}
@@ -85,7 +85,6 @@ Figure \ref{fig:poisson_seq} presents the point updates per second for \texttt{o
 \label{fig:poisson_sin}
 \end{figure}
 
-\textbf{SOMETHING ABOUT PROFILING OF SIN HERE. THE PROFILING NODE WAS/IS OVERUSED}
 For improvements, an obvious choice would be to implement the shared memory used in \texttt{gpu5} is the matmult exercise, but since each point is only used by its neighbours, most points will be used inside a single block, enabling the automatic cache control to do quite well. For the blocking to be really effective, the blocks should be iterated multiple times between being synchronized. If the blocks do e.g. 10 iterations isolated from the rest of the blocks, the flops/element would increase by a factor of 10 also. The number of iterations should be chosen to match the optimum match between flops and memory for the GPU used. This procedure would require additional calculations to get the edges of the blocks correct, but it would still be beneficial. Another optimization would be to have the loop and the pointer swap on the GPU. That way, each block could have a copy of its relevant region of $f$ in the cache all the time, which would reduce the memory transfer from the global memory by a third, leaving more bandwidth for transferring $u$ and $u_o$.
 
 
@@ -140,7 +139,6 @@ double *d0_u, *d0_uo, *d0_f, *d1_u, *d1_uo, *d1_f;
 		k++;
 	}
 \end{lstlisting}
-
 
 \begin{lstlisting}
 __global__ 
