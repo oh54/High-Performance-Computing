@@ -156,6 +156,7 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	int k = 0;
 	double checksum = 1000.0;
 			
+	cudaSetDevice(6);
 	int K = 16;
 	int gridx = ceil((N-2)*1.0/(K));
 	int gridy = ceil((N-2)*1.0/(K));
