@@ -19,25 +19,13 @@ void jacobi_single_kernel(double * d_u, double * d_uo, double * d_f, int N, doub
 }
 
 __global__ 
-void jacobi_multi_kernel1(double * d1_u, double * d1_uo, double * d1_f, int N, double delta2){
+void jacobi_multi_kernel(double * d_u, double * d_uo, double * d_f, int N, double delta2){
 	int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
 	//int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
 	int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
 	if (j < N-1 && i < N/2 && j > 0 && i > 0){
-		d1_u[i*N + j] =  0.25*(d1_uo[(i-1)*N + j] + d1_uo[(i+1)*N + j] + d1_uo[i*N + j+1] + d1_uo[i*N + j-1] + delta2*d1_f[i*N + j]);
-	}
-		
-}
-
-__global__ 
-void jacobi_multi_kernel0(double * d0_u, double * d0_uo, double * d0_f, int N, double delta2){
-	int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
-	//int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
-	int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
-	if (j < N-1 && i < N/2 && j > 0 && i > 0){
-		d0_u[i*N + j] =  0.25*(d0_uo[(i-1)*N + j] + d0_uo[(i+1)*N + j] + d0_uo[i*N + j+1] + d0_uo[i*N + j-1] + delta2*d0_f[i*N + j]);
-	}
-		
+		d_u[i*N + j] =  0.25*(d_uo[(i-1)*N + j] + d_uo[(i+1)*N + j] + d_uo[i*N + j+1] + d_uo[i*N + j-1] + delta2*d_f[i*N + j]);
+	}	
 }
 
 

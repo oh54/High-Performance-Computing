@@ -153,13 +153,11 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_f, f, memsize, cudaMemcpyHostToDevice);
 	int k = 0;
-	double checksum = 1000.0;
-			
+	double checksum = 1000.0;	
 	cudaSetDevice(6);
 	int K = 16;
 	int gridx = ceil((N-2)*1.0/(K));
 	int gridy = ceil((N-2)*1.0/(K));
-
 	double start = omp_get_wtime(); 
 	while(k < kmax){
 		jacobi_single_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d_u, d_uo, d_f, N, delta2);
@@ -207,44 +205,30 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	cudaMalloc((void**)&d1_u, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_uo, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_f, memsize/2 + Nsize);
-
 	cudaMemcpy(d1_u, &u[memsize/2/sizeof(double) -N], memsize/2 + Nsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d1_uo, &uo[memsize/2/sizeof(double) -N], memsize/2 + Nsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d1_f, &f[memsize/2/sizeof(double) -N], memsize/2 + Nsize, cudaMemcpyHostToDevice);
-	
 	int k = 0;
 	double checksum = 1000.0;	
-	
 	int K = 16;
 	int gridx = ceil((N-2)*1.0/(K));
  	int gridy = ceil((N-2)*1.0/(K));
 	gridy = ceil(gridy*1.0 / 2);
-
-	//printf("%i, %i\n", gridx, gridy);
-	//printf("NR THREADS: %i\n", 2*gridx * gridy * K * K);
 	double start = omp_get_wtime(); 
 	while(k < kmax){
 		cudaSetDevice(6);
-		jacobi_multi_kernel0<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
+		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
 		cudaSetDevice(7);
-		jacobi_multi_kernel1<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
-
+		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
 		cudaDeviceSynchronize();
-
 		double * temp = d0_uo;
     		d0_uo = d0_u;
     		d0_u = temp;
-
 		double * temp2 = d1_uo;
 		d1_uo = d1_u;
     		d1_u = temp2;
-
 		cudaMemcpy(d1_uo, d0_uo+(N-2)/2*N, Nsize, cudaMemcpyDeviceToDevice);
-		//cudaDeviceSynchronize();
-
 		cudaMemcpy(d0_uo+(N-2)/2*N+N , d1_uo+N, Nsize, cudaMemcpyDeviceToDevice);
-		//cudaDeviceSynchronize();
-
 		k++;
 	}
 	double end = omp_get_wtime();
