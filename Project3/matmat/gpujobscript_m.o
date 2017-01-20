@@ -1,0 +1,112 @@
+     6.000  50361.999 546176 # matmult_gpu1
+    24.000 406162.462 1.71269e+07 # matmult_gpu1
+    54.000 1370550.583 1.29172e+08 # matmult_gpu1
+    96.000 3249642.581 5.42464e+08 # matmult_gpu1
+   216.000 10960816.767 4.10518e+09 # matmult_gpu1
+   384.000 25980020.894 1.72694e+10 # matmult_gpu1
+   726.000 67416734.706 8.47569e+10 # matmult_gpu1
+  1536.000 208566016.628 5.51187e+11 # matmult_gpu1
+     6.000  48941.881 546176 # matmult_gpu2
+    24.000 391450.722 1.71269e+07 # matmult_gpu2
+    54.000 1320909.300 1.29172e+08 # matmult_gpu2
+    96.000 3127355.376 5.42464e+08 # matmult_gpu2
+   216.000 10569496.855 4.10518e+09 # matmult_gpu2
+   726.000 65099061.155 8.47569e+10 # matmult_gpu2
+  1536.000 199269045.415 5.51187e+11 # matmult_gpu2
+  2904.000 510478921.171 2.7071e+12 # matmult_gpu2
+ 11616.000 4176948517.579 8.65455e+13 # matmult_gpu2
+ 24576.000 12856430549.795 5.63316e+14 # matmult_gpu2
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 1282895: <gpujobscript_m> in cluster <DCC> Exited
+
+Job <gpujobscript_m> was submitted from host <n-62-30-10> by user <s123184> in cluster <DCC>.
+Job was executed on host(s) <n-62-28-32>, in queue <hpc>, as user <s123184> in cluster <DCC>.
+</zhome/f7/e/77392> was used as the home directory.
+</zhome/f7/e/77392/02614_HPC/Week1/Assignment1/High-Performance-Computing/Project3/matmat> was used as the working directory.
+Started at Fri Jan 20 10:04:21 2017
+Results reported on Fri Jan 20 10:05:37 2017
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/sh
+### General options
+### –- specify queue --
+#BSUB -q k40
+### -- set the job Name --
+#BSUB -J k40job
+### -- ask for number of cores (default: 1) --
+#BSUB -n 2
+### -- Select the resources: 2 gpus in exclusive process mode --
+#BSUB -R "rusage[ngpus_excl_p=1]"
+### -- set walltime limit: hh:mm --
+#BSUB -W 00:30
+### -- set the email address --
+# please uncomment the following line and put in your e-mail address,
+# if you want to receive e-mail notifications on a non-default address
+##BSUB -u your_email_address
+### -- send notification at start --
+#BSUB -B
+### -- send notification at completion--
+#BSUB -N
+### -- Specify the output and error file. %J is the job-id --
+### -- -o and -e mean append, -oo and -eo mean overwrite --
+#BSUB -o gpu-%J.out
+#BSUB -e gpu_%J.err
+
+# -- end of LSF options --
+
+# Load the cuda module
+module load cuda/8.0
+
+# * this program sees only the gpu's which are requested.
+# * double check the number of your requested gpus above.
+# * max-walltime in this queue is 30 minutes
+# * this node has only 12 cores, so please don't request more
+#   than 2 cpu-cores
+#
+sizes1=( 16 32 48 64 96 128 176 256 )
+
+for size in ${sizes1[@]}
+ do
+    ./matmult_f.nvcc2 gpu1 $size $size $size
+ done
+
+sizes=( 16 32 48 64 96 128 176 256 352 512 704 1024 1408 2048 2816 4096 )
+
+for size in ${sizes[@]}
+ do
+    ./matmult_f.nvcc2 gpu2 $size $size $size
+ done
+
+
+(... more ...)
+------------------------------------------------------------
+
+TERM_OWNER: job killed by owner.
+Exited with signal termination: Killed.
+
+Resource usage summary:
+
+    CPU time :                                   32.04 sec.
+    Max Memory :                                 69 MB
+    Average Memory :                             12.50 MB
+    Total Requested Memory :                     -
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   75 sec.
+    Turnaround time :                            76 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <gpujobscript_m.e> for stderr output of this job.
+

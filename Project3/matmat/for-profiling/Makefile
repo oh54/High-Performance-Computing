@@ -5,7 +5,7 @@ LIBOBJS	= ass1_lib.o
 OPT	= -g
 PIC = -fpic
 XPIC  = -Xcompiler -fpic
-XOPTS = -Xptxas=-v
+XOPTS = -G -Xptxas=-v
 ARCH  = -arch=sm_30
 OMP   = -fopenmp
 

@@ -50,7 +50,7 @@ void matmult_gpu1(int m, int n, int k, double * A, double * B, double * C){
 // Naive GPU - 1 thread per element in C
 __host__
 void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){
-	int K = 16;
+	int K = 32;
 	int gridx = ceil(n*1.0/K);
 	int gridy = ceil(m*1.0/K);
 	double *d_A, *d_B, *d_C;
@@ -76,7 +76,7 @@ void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){
 // Each thread does neighbouring fields
 __host__
 void matmult_gpu3(int m, int n, int k, double * A, double * B, double * C){
-	int K = 16;
+	int K = 32;
 	int p = 2;
 	int gridx = ceil(n*1.0/K);
 	int gridy = ceil(m*1.0/K/p);
@@ -100,7 +100,7 @@ void matmult_gpu3(int m, int n, int k, double * A, double * B, double * C){
 
 
 void matmult_gpu4(int m, int n, int k, double * A, double * B, double * C){
-	int K = 16;
+	int K = 32;
 	int p = 4;
 	int gridx = ceil(n*1.0/K);
 	int gridy = ceil(m*1.0/K/p);
@@ -126,7 +126,7 @@ void matmult_gpu4(int m, int n, int k, double * A, double * B, double * C){
 void matmult_gpu5(int m, int n, int k, double * A, double * B, double * C){
 	
 //	cudaSetDevice(4);
-	int K = 16;
+	int K = 32;
 	int gridx = floor(n*1.0/K);
 	int gridy = floor(m*1.0/K);
 	double *d_A, *d_B, *d_C;
@@ -283,7 +283,7 @@ void cudaPar4(int m, int n, int k, int p, double * A, double * B, double * C){
 __global__
 void cudaSMEM(int m, int n, int k, double * A, double * B, double * C){
 	
-	const int K = 16;	
+	const int K = 32;	
 	int kk = k/K;
 
 	int i = blockIdx.x*blockDim.x + threadIdx.x;
