@@ -19,11 +19,16 @@ void jacobi_single_kernel(double * d_u, double * d_uo, double * d_f, int N, doub
 }
 
 __global__ 
-void jacobi_multi_kernel(double * d0_u, double * d0_uo, double * d0_f, int N, double delta2){
+void jacobi_multi_kernel(double * d_u, double * d_uo, double * d_f, int N, double delta2){
 	int j = blockIdx.x * blockDim.x + threadIdx.x + 1;
 	int i = blockIdx.y * blockDim.y + threadIdx.y + 1;
-	
-	d0_u[i*N + j] = 0.25*(d0_uo[(i-1)*N + j] + d0_uo[(i+1)*N + j] + d0_uo[i*N + j+1] + d0_uo[i*N + j-1] + delta2*d0_f[i*N + j]);
+	//int i = threadIdx.y + 1;
+	if (j < N-1 && i < N-1 && j > 0 && i > 0){
+		double val = 0.25*(d_uo[(i-1)*N + j] + d_uo[(i+1)*N + j] + d_uo[i*N + j+1] + d_uo[i*N + j-1] + delta2*d_f[i*N + j]);
+		//printf("THREAD (%i, %i)\n", i, j);
+		d_u[i*N + j] = val;
+	}
+		
 }
 
 
