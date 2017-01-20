@@ -126,7 +126,7 @@ void matmult_gpu4(int m, int n, int k, double * A, double * B, double * C){
 void matmult_gpu5(int m, int n, int k, double * A, double * B, double * C){
 	
 //	cudaSetDevice(4);
-	int K = 16;
+	int K = 32;
 	int gridx = floor(n*1.0/K);
 	int gridy = floor(m*1.0/K);
 	double *d_A, *d_B, *d_C;
@@ -227,22 +227,27 @@ void cudaPar2(int m, int n, int k, int p, double * A, double * B, double * C){
 	j = j*p; // allows C[i + (0/1) j*n] indexing
 	if(i < n && j < m-p + 1){ // only works if n%p = 0
 
-		for(int pp = 0; pp < p; pp++){
-			for(int l = 0; l < k; l++){
+
+		for(int l = 0; l < k; l++){
+			C_r[0] += A[(j + 0)*k + l]*B[n*l + i];
+			C_r[1] += A[(j + 1)*k + l]*B[n*l + i];
+/*for(int pp = 0; pp < p; pp++){
 				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
-			}
-			C[(j + pp)*n + i] =  C_r[pp];
+			}*/
 		}
 
+		for(int pp = 0; pp < p; pp++) C[(j + pp)*n + i] =  C_r[pp];
 	}
 
 	if(i < n && j > m-p && j < m){
-		for(int pp = 0; pp < p; pp++){
-			for(int l = 0; l < k; l++){
+		for(int l = 0; l < k; l++){
+			C_r[0] += A[(j + 0)*k + l]*B[n*l + i];
+			C_r[1] += A[(j + 1)*k + l]*B[n*l + i];
+/*			for(int pp = 0; pp < p; pp++){
 				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
-			}
-			C[(j + pp)*n + i] =  C_r[pp];
+			}*/
 		}
+		for(int pp = 0; pp < p; pp++) C[(j + pp)*n + i] =  C_r[pp];
 
 
 	}
@@ -261,21 +266,30 @@ void cudaPar4(int m, int n, int k, int p, double * A, double * B, double * C){
 
 	j = j*p; // allows C[i + (0/1) j*n] indexing
 	if(i < n && j < m-p + 1){
-		for(int pp = 0; pp < p; pp++){
-			for(int l = 0; l < k; l++){
+
+		for(int l = 0; l < k; l++){
+			C_r[0] += A[(j + 0)*k + l]*B[n*l + i];
+			C_r[1] += A[(j + 1)*k + l]*B[n*l + i];
+			C_r[2] += A[(j + 2)*k + l]*B[n*l + i];
+			C_r[3] += A[(j + 3)*k + l]*B[n*l + i];
+			/*for(int pp = 0; pp < p; pp++){
 				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
-			}
-			C[(j + pp)*n + i] =  C_r[pp];
+			}*/
 		}
+		for(int pp = 0; pp < p; pp++) C[(j + pp)*n + i] =  C_r[pp];
 	}
 
 	if(i < n && j > m-p && j < m){
-		for(int pp = 0; pp < p; pp++){
-			for(int l = 0; l < k; l++){
+		for(int l = 0; l < k; l++){
+			C_r[0] += A[(j + 0)*k + l]*B[n*l + i];
+			C_r[1] += A[(j + 1)*k + l]*B[n*l + i];
+			C_r[2] += A[(j + 2)*k + l]*B[n*l + i];
+			C_r[3] += A[(j + 3)*k + l]*B[n*l + i];			
+/*			for(int pp = 0; pp < p; pp++){
 				C_r[pp] += A[(j+ pp)*k + l]*B[n*l + i];
-			}
-			C[(j + pp)*n + i] =  C_r[pp];
+			}*/
 		}
+		for(int pp = 0; pp < p; pp++) C[(j + pp)*n + i] =  C_r[pp];
 	}
 
 }
@@ -283,7 +297,7 @@ void cudaPar4(int m, int n, int k, int p, double * A, double * B, double * C){
 __global__
 void cudaSMEM(int m, int n, int k, double * A, double * B, double * C){
 	
-	const int K = 16;	
+	const int K = 32;	
 	int kk = k/K;
 
 	int i = blockIdx.x*blockDim.x + threadIdx.x;

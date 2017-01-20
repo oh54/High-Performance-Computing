@@ -1,0 +1,9 @@
+%% plot GPU
+
+
+loadGPU
+
+gpu1 = gpu15lib(1:9,:);
+gpu(:,:,i) = gpu15lib(10:10+15,:);
+%%
+for i = 1:5

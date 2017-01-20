@@ -1,0 +1,11 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {2}Assignment}{1}
+\contentsline {subsection}{\numberline {2.1}Matrix matrix multiplication problem}{1}
+\contentsline {subsubsection}{\numberline {2.1.1}GPU1}{2}
+\contentsline {subsubsection}{\numberline {2.1.2}GPU2}{2}
+\contentsline {subsubsection}{\numberline {2.1.3}GPU3}{5}
+\contentsline {subsubsection}{\numberline {2.1.4}GPU4}{6}
+\contentsline {subsubsection}{\numberline {2.1.5}GPU5}{7}
+\contentsline {subsubsection}{\numberline {2.1.6}GPULIB}{9}
+\contentsline {subsection}{\numberline {2.2}Poisson problem}{10}

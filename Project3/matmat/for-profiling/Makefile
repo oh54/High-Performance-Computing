@@ -12,7 +12,7 @@ OMP   = -fopenmp
 CXX	= nvcc
 CXXFLAGS= --compiler-options "$(OPT) $(PIC) $(OMP)" $(ARCH) $(XOPTS) $(XPIC)
 
-CUDA_PATH ?= /appl/cuda/8.0
+CUDA_PATH ?= /appl/cuda/6.5
 INCLUDES = -I$(CUDA_PATH)/include -I$(CUDA_PATH)/samples/common/inc
 
 SOFLAGS = -shared
