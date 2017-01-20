@@ -37,7 +37,7 @@ Obviously, using only 1 thread is not the way to use a GPU to increase performan
 \begin{lstlisting}[caption = Code sample of the naive implementation with one thread per element in $C$.]
 __host__
 void matmult_gpu2(int m, int n, int k, double * A, double * B, double * C){	
-	int K = 32;
+	int K = 16;
 	int gridx = ceil(n*1.0/K);
 	int gridy = ceil(m*1.0/K);
 	...
