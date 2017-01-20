@@ -20,8 +20,8 @@
 #BSUB -N
 ### -- Specify the output and error file. %J is the job-id --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o gpu-%J.out
-#BSUB -e gpu_%J.err
+#BSUB -oo gpu-%J.out
+#BSUB -eo gpu_%J.err
 
 # -- end of LSF options --
 
@@ -35,4 +35,13 @@ module load cuda/8.0
 #   than 2 cpu-cores
 #
 
-./myprogram
+kmax=100
+d=1000
+
+sizes=( 16 32 48 64 96 128 176 256 352 512 704 1024 1408 2048 2816 4096 )
+
+for N in ${sizesn[@]}
+ do
+  ./poisson mul $N $d $kmax
+ done
+
