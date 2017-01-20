@@ -136,6 +136,9 @@ void doSeq(double * u, double * uo, double * f, int N, double d, int kmax, doubl
 	printf("%s, ", "CU-SEQ");
 	printf("%f, ", omp_get_wtime()-start);
 	printf("%i, %.20f, %.0f, %i\n", N, dd, getMatSum(uo, N), k);
+	cudaFree(d_u);
+	cudaFree(d_uo);
+	cudaFree(d_f);
 }
 
 
@@ -153,10 +156,10 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	int k = 0;
 	double checksum = 1000.0;
 			
-	int K = 4;
+	int K = 16;
 	int gridx = ceil((N-2)*1.0/(K));
 	int gridy = ceil((N-2)*1.0/(K));
-	
+
 	while(k < kmax){
 		jacobi_single_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d_u, d_uo, d_f, N, delta2);
 		double * temp = d_uo;
@@ -166,13 +169,18 @@ void doSingle(double * u, double * uo, double * f, int N, double d, int kmax, do
 	}
 	cudaMemcpy(uo, d_uo, memsize, cudaMemcpyDeviceToHost);
 
-	printf("MATRIX UO:\n");
-	printMat(uo,N);
-	printf("\n");
+	//printf("MATRIX UO:\n");
+	//printMat(uo,N);
+	//printf("\n");
 
 	printf("%s, ", "CU-SIN");
 	printf("%f, ", omp_get_wtime()-start);
 	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(uo, N));
+	cudaFree(d_u);
+	cudaFree(d_uo);
+	cudaFree(d_f);
+
+
 }
 
 
@@ -184,15 +192,16 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	int Nsize = N*sizeof(double);
 
 	cudaSetDevice(0);
+	cudaDeviceEnablePeerAccess(1,0);
 	cudaMalloc((void**)&d0_u, memsize/2 + Nsize);
 	cudaMalloc((void**)&d0_uo, memsize/2 + Nsize);
 	cudaMalloc((void**)&d0_f, memsize/2 + Nsize);
 	cudaMemcpy(d0_u, u, memsize/2 + Nsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d0_uo, uo, memsize/2 + Nsize, cudaMemcpyHostToDevice);
 	cudaMemcpy(d0_f, f, memsize/2 + Nsize, cudaMemcpyHostToDevice);
-	//cudaDeviceEnablePeerAccess (1, 0);
 
 	cudaSetDevice(1); 
+	cudaDeviceEnablePeerAccess(0,0);
 	cudaMalloc((void**)&d1_u, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_uo, memsize/2 + Nsize);
 	cudaMalloc((void**)&d1_f, memsize/2 + Nsize);
@@ -204,24 +213,22 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	int k = 0;
 	double checksum = 1000.0;	
 	
-	int K = 4;
+	int K = 16;
 	int gridx = ceil((N-2)*1.0/(K));
  	int gridy = ceil((N-2)*1.0/(K));
 	gridy = ceil(gridy*1.0 / 2);
 
-	printf("NR THREADS: %i\n", 2*gridx * gridy * K * K);
+	//printf("%i, %i\n", gridx, gridy);
+	//printf("NR THREADS: %i\n", 2*gridx * gridy * K * K);
 
 	while(k < kmax){
 		cudaSetDevice(0);
-		cudaDeviceEnablePeerAccess(1, 0); 
 		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d0_u, d0_uo, d0_f, N, delta2);
-		checkCudaErrors(cudaDeviceSynchronize());
 		cudaSetDevice(1);
-		cudaDeviceEnablePeerAccess(0, 0); 
 		jacobi_multi_kernel<<<dim3(gridx,gridy),dim3(K,K)>>>(d1_u, d1_uo, d1_f, N, delta2);
 
-		checkCudaErrors(cudaDeviceSynchronize());
-		
+		cudaDeviceSynchronize();
+
 		double * temp = d0_uo;
     		d0_uo = d0_u;
     		d0_u = temp;
@@ -230,23 +237,11 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 		d1_uo = d1_u;
     		d1_u = temp2;
 
-		//WORKING OLD
-		
-		//cudaSetDevice(0);
-		//cudaMemcpy(u, d0_u, memsize/2, cudaMemcpyDeviceToHost);
-		//cudaSetDevice(1);
-		//cudaMemcpy(&u[memsize/2/sizeof(double)], &d1_u[N], memsize/2, cudaMemcpyDeviceToHost);
+		cudaMemcpy(d1_uo, d0_uo+(N-2)/2*N, Nsize, cudaMemcpyDeviceToDevice);
+		//cudaDeviceSynchronize();
 
-		//printf("MATRIX U:\n");
-		//printMat(u,N);
-		//printf("\n");
-
-		//update_uo(u, uo, N);
-		//cudaSetDevice(0);
-		//cudaMemcpy(d0_uo, uo, memsize/2 + Nsize, cudaMemcpyHostToDevice);
-		//cudaSetDevice(1);
-		//cudaMemcpy(d1_uo, &uo[memsize/2/sizeof(double) -N], memsize/2 + Nsize, cudaMemcpyHostToDevice);
-
+		cudaMemcpy(d0_uo+(N-2)/2*N+N , d1_uo+N, Nsize, cudaMemcpyDeviceToDevice);
+		//cudaDeviceSynchronize();
 
 		k++;
 	}
@@ -254,15 +249,23 @@ void doMulti(double * u, double * uo, double * f, int N, double d, int kmax, dou
 	cudaMemcpy(uo, d0_uo, memsize/2, cudaMemcpyDeviceToHost);
 	cudaSetDevice(1);
 	cudaMemcpy(&uo[memsize/2/sizeof(double)], &d1_uo[N], memsize/2, cudaMemcpyDeviceToHost);
-	checkCudaErrors(cudaDeviceSynchronize());
+	cudaDeviceSynchronize();
 
-	printf("MATRIX UO:\n");
-	printMat(uo,N);
-	printf("\n");
+	//printf("MATRIX UO:\n");
+	//printMat(uo,N);
+	//printf("\n");
 
 	printf("%s, ", "CU-MUL");
 	printf("%f, ", omp_get_wtime()-start);
 	printf("%i, %.20f, %i, %.0f\n", N, dd, k, getMatSum(uo, N));
+	cudaFree(d1_u);
+	cudaFree(d1_uo);
+	cudaFree(d1_f);
+	cudaFree(d0_u);
+	cudaFree(d0_uo);
+	cudaFree(d0_f);
+
+	
 }
 
 
