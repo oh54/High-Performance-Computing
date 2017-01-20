@@ -1,1 +1,54 @@
 \subsection{Poisson problem}
+In this section, the Poisson problem is revisited and implemented to run on a GPU. The Poisson problem is memory bound, and thus the limiting factor of the computation is the memory bandwidth to the cores. In all three subsequent subsections, the memory is initialized on the CPU and then transferred to the GPU for computations, and transferred back in the end.
+
+\subsubsection{Single thread on GPU}
+Again, we begin by implementing a kernel that runs exactly like the sequential CPU version, but on the GPU. This ensures that the cuda framework is correct, and that the kernel produces the right result. The framework is shown below, with the source code of \texttt{jacobi\_seq\_kernel} is identical to the sequential version in project 2. 
+
+\begin{lstlisting}
+cudaMalloc(&d_u, memsize);
+	cudaMalloc(&d_uo, memsize);
+	cudaMalloc(&d_f, memsize);	
+	cudaMemcpy(d_u, u, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_uo, uo, memsize, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_f, f, memsize, cudaMemcpyHostToDevice);
+
+	int k = 0;
+	while(k < kmax){
+		jacobi_seq_kernel<<<1, 1>>>(d_u, d_uo, d_f, N, delta2);
+		double * temp = d_uo;
+    		d_uo = d_u;
+    		d_u = temp;
+		k++;
+	}
+
+	cudaMemcpy(uo, d_uo, memsize, cudaMemcpyDeviceToHost);
+	cudaFree(d_u);
+	cudaFree(d_uo);
+	cudaFree(d_f);
+\end{lstlisting}
+In this project we do not consider the convergence, and thus, the program iterates until a user-specified maximum is reached. The timing of the function is measured for different matrix sizes ranging from $16\times 16$ to $256\times 256$ and compared to the \texttt{omp3} function from project 2. From project 2, we know that the optimal number of cores is dependent on the matrix size due to parallel overhead, so for matrices smaller than $100 \times 100$, we will use a single core, and for matrices larger than that, we will use 2 cores. The resulting graph is shown in figure \ref{fig:poisson_seq}
+
+\begin{figure}
+\centering
+\includegraphics[width = 0.8\textwidth]{fig/placeholder.jpg}
+\caption{}
+\label{fig:poisson_seq}
+\end{figure}
+
+
+
+\subsubsection{Naive version with 1 thread per element}
+One thread to do all the work is obviously not good, so we implement a naive version of one thread per element of the matrices. Per iteration, each thread loads 5 values (4 neighbours from $u_o$ and 1 from $f$) and performs 6 Flops, and the problem is thus memory bound. The timings are compared to the best OMP version in figure \ref{fig:poisson_sin}. For the OMP version, we use increasing number of threads with increasing matrix sizes.
+
+\begin{figure}
+\centering
+\includegraphics[width = 0.8\textwidth]{fig/placeholder.jpg}
+\caption{}
+\label{fig:poisson_sin}
+\end{figure}
+
+\textbf{SOMETHING ABOUT PROFILING OF SIN HERE. THE PROFILING NODE WAS/IS OVERUSED}
+For improvements, an obvious choice would be to implement the shared memory used in \texttt{gpu5} is the matmult exercise, but since each point is only used by its neighbours, most points will be used inside a single block, enabling the automatic cache control to do quite well. For the blocking to be really effective, the blocks should be iterated multiple times between being synchronized. If the blocks do e.g. 10 iterations isolated from the rest of the blocks, the flops/element would increase by a factor of 10 also. The number of iterations should be chosen to match the optimum match between flops and memory for the GPU used. This procedure would require additional calculations to get the edges of the blocks correct, but it would still be beneficial. Another optimization would be to have the loop and the pointer swap on the GPU. That way, each block could have a copy of its relevant region of $f$ in the cache all the time, which would reduce the memory transfer from the global memory by a third, leaving more bandwidth for transferring $u$ and $u_o$.
+
+
+\subsection{Mutli-GPU}

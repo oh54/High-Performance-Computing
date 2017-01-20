@@ -9,3 +9,6 @@
 \contentsline {subsubsection}{\numberline {2.1.5}GPU5}{7}
 \contentsline {subsubsection}{\numberline {2.1.6}GPULIB}{9}
 \contentsline {subsection}{\numberline {2.2}Poisson problem}{10}
+\contentsline {subsubsection}{\numberline {2.2.1}Single thread on GPU}{11}
+\contentsline {subsubsection}{\numberline {2.2.2}Naive version with 1 thread per element}{11}
+\contentsline {subsection}{\numberline {2.3}Mutli-GPU}{13}

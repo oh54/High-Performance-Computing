@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2013.1.15)  20 JAN 2017 19:27
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2013.1.15)  20 JAN 2017 21:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1564,40 +1564,57 @@ File: fig/gpulib-eps-converted-to.pdf Graphic file (type pdf)
 Package pdftex.def Info: fig/gpulib-eps-converted-to.pdf used on input line 209
 .
 (pdftex.def)             Requested size: 352.3597pt x 264.27333pt.
-) (./tex/poisson.tex)
-(./tex/conclusion.tex)
+) (./tex/poisson.tex
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 13.59999pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[10 <./fig/gpulib-eps-converted-to.pdf>] (./Assignment2_report_mikkel.aux) ) 
+[10 <./fig/gpulib-eps-converted-to.pdf>]
+<fig/placeholder.jpg, id=94, 240.9pt x 167.62625pt>
+File: fig/placeholder.jpg Graphic file (type jpg)
+ <use fig/placeholder.jpg>
+Package pdftex.def Info: fig/placeholder.jpg used on input line 33.
+(pdftex.def)             Requested size: 352.3597pt x 245.20801pt.
+File: fig/placeholder.jpg Graphic file (type jpg)
+
+<use fig/placeholder.jpg>
+Package pdftex.def Info: fig/placeholder.jpg used on input line 45.
+(pdftex.def)             Requested size: 352.3597pt x 245.20801pt.
+ [11]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 13.59999pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[12 <./fig/placeholder.jpg>]) (./tex/conclusion.tex) [13]
+(./Assignment2_report_mikkel.aux) ) 
 Here is how much of TeX's memory you used:
- 24362 strings out of 493488
- 478569 string characters out of 3142199
+ 24395 strings out of 493488
+ 478953 string characters out of 3142199
  543484 words of memory out of 3000000
- 27170 multiletter control sequences out of 15000+200000
+ 27201 multiletter control sequences out of 15000+200000
  18357 words of font info for 68 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  58i,12n,55p,1481b,1720s stack positions out of 5000i,500n,10000p,200000b,50000s
-</a
-ppl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></appl
-/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></appl/la
-tex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></appl/late
-x/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></appl/latex/T
-exLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></appl/latex/TexLi
-ve12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></appl/latex/TexLive12
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></appl/latex/TexLive12/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></appl/latex/TexLive12/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmsy10.pfb></appl/latex/TexLive12/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmti10.pfb></appl/latex/TexLive12/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmti12.pfb></appl/latex/TexLive12/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on Assignment2_report_mikkel.pdf (12 pages, 219073 bytes).
+</appl/latex/TexLive12/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmbx10.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmbx12.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmcsc10.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi10.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmmi8.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr10.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmr12.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r8.pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.
+pfb></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb
+></appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></
+appl/latex/TexLive12/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on Assignment2_report_mikkel.pdf (15 pages, 234564 bytes).
 PDF statistics:
- 133 PDF objects out of 1000 (max. 8388607)
- 93 compressed objects within 1 object stream
+ 144 PDF objects out of 1000 (max. 8388607)
+ 100 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 48 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 53 words of extra memory for PDF output out of 10000 (max. 10000000)
 
